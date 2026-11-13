@@ -16,8 +16,8 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); }
   overflow: auto; background: var(--bg); border: 1px solid var(--border);
   border-radius: 8px; padding: 12px 14px; box-shadow: 0 2px 8px rgb(0 0 0 / .08);
 }
-h1 { font-size: 16px; margin: 0 0 10px; }
-h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 14px 0 6px; }
+#panel h1 { font-size: 16px; margin: 0 0 10px; }
+#panel h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 14px 0 6px; }
 .field { display: flex; flex-direction: column; gap: 4px; color: var(--muted); font-size: 12px; }
 select { font: inherit; padding: 4px; }
 #cities { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
@@ -37,9 +37,66 @@ select { font: inherit; padding: 4px; }
 .popup table { border-collapse: collapse; font-size: 12px; }
 .popup th { text-align: left; color: var(--muted); font-weight: normal; padding: 1px 10px 1px 0; vertical-align: top; }
 .popup td { padding: 1px 0; word-break: break-all; }
+.popup .empty { color: var(--muted); font-style: italic; }
 .popup .links { margin-top: 8px; display: flex; gap: 10px; font-size: 12px; }
 .maplibregl-popup-content { padding: 10px 12px; }
 
-@media (max-width: 600px) {
-  #panel { top: auto; bottom: 12px; left: 12px; right: 12px; width: auto; max-height: 40%; }
+/* --- city profile ------------------------------------------------------- */
+#profile {
+  position: absolute; top: 12px; right: 12px; width: 340px; max-height: calc(100% - 48px);
+  overflow: auto; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 16px; box-shadow: 0 2px 8px rgb(0 0 0 / .08);
+}
+#profile header h2 { font-size: 18px; margin: 0; }
+#profile .total { font-size: 13px; margin: 2px 0; }
+#profile .total b { font-size: 22px; font-variant-numeric: tabular-nums; }
+#profile h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 18px 0 8px; }
+#profile h4 { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 12px 0 4px; }
+#profile h4 .num { margin-left: auto; }
+.muted { color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.empty-state { color: var(--muted); margin: 0; }
+
+.stack { display: flex; gap: 2px; height: 14px; }
+.stack .seg { min-width: 2px; }
+.stack .seg:first-child { border-radius: 4px 0 0 4px; }
+.stack .seg:last-child { border-radius: 0 4px 4px 0; }
+.comfort-summary { display: flex; flex-direction: column; gap: 2px; font-size: 12px; margin: 8px 0; }
+.class-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.class-table td { padding: 2px 0; }
+.class-table td:first-child { display: flex; align-items: center; gap: 8px; }
+.class-table td.num { padding-left: 10px; }
+
+#profile ul { list-style: none; margin: 0; padding: 0 0 0 26px; }
+.sc { padding: 3px 0; }
+.sc button {
+  all: unset; display: flex; width: 100%; gap: 8px; cursor: pointer; font-size: 13px;
+}
+.sc button:hover .sc-name { text-decoration: underline; }
+.sc.active .sc-name { font-weight: 600; }
+.sc-name { flex: 1; }
+.sc-bar { height: 3px; background: var(--hover); border-radius: 2px; margin-top: 3px; }
+.sc-bar span { display: block; height: 100%; border-radius: 2px; }
+.sc-meta { display: flex; gap: 8px; font-size: 11px; margin-top: 2px; }
+.sc-meta:empty { display: none; }
+.flag { color: #b54708; }
+.sc-plain { font-size: 13px; padding: 2px 0; color: var(--muted); }
+.excluded ul { padding-left: 0; }
+.focus-chip {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+  background: var(--hover); border-radius: 12px; padding: 3px 4px 3px 10px; margin-bottom: 4px;
+}
+.focus-chip button { all: unset; cursor: pointer; padding: 0 6px; font-size: 14px; }
+#profile footer { font-size: 11px; margin-top: 18px; border-top: 1px solid var(--border); padding-top: 8px; }
+#profile footer p { margin: 4px 0 0; }
+a { color: #0b63c4; }
+
+#tip {
+  position: fixed; display: none; pointer-events: none; z-index: 10; font-size: 12px;
+  background: var(--fg); color: var(--bg); padding: 4px 8px; border-radius: 4px;
+}
+
+@media (max-width: 700px) {
+  #panel { top: 8px; left: 8px; right: 8px; width: auto; max-height: 35%; }
+  #profile { top: auto; bottom: 8px; left: 8px; right: 8px; width: auto; max-height: 45%; }
 }

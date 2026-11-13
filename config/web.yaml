@@ -9,15 +9,14 @@ cities:
   - {name: Montreal, center: [-73.63, 45.52], zoom: 11}
 
 # Fields shown when a segment is clicked, in order. key = common column name.
+# Empty values are hidden unless show_empty: true (then shown as "not recorded").
 popup:
   - {key: source_class,           label: Source class}
   - {key: source_class_secondary, label: Source class (secondary)}
-  - {key: surface_type,           label: Surface}
+  - {key: surface_type,           label: Surface, show_empty: true}
   - {key: width_m,                label: Width (m)}
   - {key: length_km_source,       label: Length (km)}
   - {key: municipality,           label: Municipality}
-  - {key: source_record_id,       label: Source record id}
-  - {key: id,                     label: Segment id}
 
 # External links shown in the popup. {lat},{lng} = point on the segment nearest the click;
 # {heading} = direction of travel along the segment (degrees).

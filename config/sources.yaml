@@ -27,3 +27,10 @@ ccnd_2024:
     path: data/raw/ccnd/2024/canadian_cycling_network_database/data_sources.csv
     key: municipality
     fields: [provider, year_updated, source_url, license, attribution]
+  # StatCan's per-municipality source_class -> canbics_class assignments (incl. excluded classes).
+  dictionary:
+    path: data/raw/ccnd/2024/canadian_cycling_network_database/classification_dictionary.csv
+    municipality: municipality
+    source_class: source_class
+    class: canbics_class
+    example_url: street_view_url

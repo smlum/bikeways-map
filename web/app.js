@@ -14,6 +14,8 @@ async function main() {
   const classes = cfg.classes.classes;
   const byslug = Object.fromEntries(classes.map((c) => [c.slug, c]));
   const hidden = new Set();
+  const state = { summary: null, city: null, focus: null };
+  const profileEl = document.getElementById("profile");
 
   document.title = document.getElementById("title").textContent = cfg.title;
 
@@ -24,7 +26,7 @@ async function main() {
     zoom: cfg.cities[0].zoom,
     hash: true,
   });
-  map.addControl(new maplibregl.NavigationControl(), "top-right");
+  map.addControl(new maplibregl.NavigationControl(), "bottom-left");
   window.map = map; // for debugging in devtools
 
   // --- controls -------------------------------------------------------------
@@ -36,7 +38,7 @@ async function main() {
   cfg.cities.forEach((c) => {
     const b = document.createElement("button");
     b.textContent = c.name;
-    b.onclick = () => map.flyTo({ center: c.center, zoom: c.zoom });
+    b.onclick = () => { setCity(c.name); map.flyTo({ center: c.center, zoom: c.zoom }); };
     cities.append(b);
   });
 
@@ -60,9 +62,43 @@ async function main() {
   function applyFilter() {
     const f = hidden.size ? ["!", ["in", ["get", "class"], ["literal", [...hidden]]]] : null;
     map.setFilter(LINE_ID, f);
+    // Source-class focus: dim everything else rather than hiding it, to keep context.
+    const match = state.focus && ["all",
+      ["==", ["get", "municipality"], state.city], ["==", ["get", "source_class"], state.focus]];
+    map.setPaintProperty(LINE_ID, "line-opacity", match ? ["case", match, 1, 0.12] : 1);
   }
 
-  function setSource(src) {
+  // --- city profile -----------------------------------------------------------
+  function renderProfile() {
+    const data = state.summary?.municipalities[state.city];
+    Profile.render(profileEl, {
+      name: state.city, data, classes: cfg.classes, focus: state.focus,
+      onFocus: (sc) => { state.focus = sc; applyFilter(); renderProfile(); },
+    });
+  }
+
+  function setCity(name) {
+    if (name === state.city) return;
+    state.city = name;
+    state.focus = null;
+    if (map.getLayer(LINE_ID)) applyFilter();
+    renderProfile();
+  }
+
+  // Active city = smallest municipality whose bounds contain the map centre.
+  function cityAtCenter() {
+    if (!state.summary || map.getZoom() < 8) return null;
+    const { lng, lat } = map.getCenter();
+    const hits = Object.entries(state.summary.municipalities)
+      .filter(([, m]) => lng >= m.bounds[0] && lat >= m.bounds[1] && lng <= m.bounds[2] && lat <= m.bounds[3])
+      .sort(([, a], [, b]) => area(a.bounds) - area(b.bounds));
+    return hits[0]?.[0] ?? null;
+  }
+  const area = (b) => (b[2] - b[0]) * (b[3] - b[1]);
+
+  async function setSource(src) {
+    state.summary = src.summary ? await (await fetch(`data/${src.summary}`)).json() : null;
+    state.city = null;
     for (const id of [HILITE_ID, LINE_ID]) if (map.getLayer(id)) map.removeLayer(id);
     if (map.getSource("network")) map.removeSource("network");
 
@@ -91,6 +127,7 @@ async function main() {
       },
     }, beforeId);
     applyFilter();
+    setCity(cityAtCenter());
   }
 
   // --- interaction ----------------------------------------------------------
@@ -110,9 +147,11 @@ async function main() {
     if (!f) return popup.remove();
     const p = f.properties;
     const c = byslug[p.class] || { ...cfg.classes.unknown, label: p.class ?? "Unknown" };
+    const isEmpty = (v) => v === undefined || v === null || v === "";
     const rows = cfg.popup
-      .filter((k) => p[k.key] !== undefined && p[k.key] !== null && p[k.key] !== "")
-      .map((k) => `<tr><th>${k.label}</th><td>${esc(p[k.key])}</td></tr>`).join("");
+      .filter((k) => k.show_empty || !isEmpty(p[k.key]))
+      .map((k) => `<tr><th>${k.label}</th><td>${isEmpty(p[k.key])
+        ? '<span class="empty">not recorded</span>' : esc(p[k.key])}</td></tr>`).join("");
     const snap = nearestOnLine(map, f.geometry, e.point);
     const links = (cfg.links || []).map((l) => {
       const url = l.url.replace("{lat}", snap.lat.toFixed(6)).replace("{lng}", snap.lng.toFixed(6))
@@ -124,6 +163,11 @@ async function main() {
        <table>${rows}</table>${links ? `<div class="links">${links}</div>` : ""}</div>`);
     if (!popup.isOpen()) popup.addTo(map);
     map.setFilter(HILITE_ID, ["==", ["get", "id"], p.id]);
+  });
+
+  map.on("moveend", () => {
+    const c = cityAtCenter();
+    if (c) setCity(c);
   });
 
   map.on("load", () => setSource(cfg.sources[0]));

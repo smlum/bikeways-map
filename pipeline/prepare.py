@@ -16,7 +16,10 @@ def run(source_id: str) -> None:
     print(f"[prepare] {source_id}: read {len(gdf):,} features")
 
     gdf = geo.rename_columns(gdf, src["columns"])
+    n = len(gdf)
     gdf = geo.drop_empty(geo.drop_z(gdf))
+    if len(gdf) < n:
+        print(f"[prepare] dropped {n - len(gdf)} empty geometries")
     gdf["id"] = geo.stable_ids(gdf, prefix=source_id, fields=["source_record_id"])
     gdf = geo.to_wgs84(gdf)
     gdf["length_km"] = geo.geodesic_length_km(gdf)
