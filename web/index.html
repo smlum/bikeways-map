@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bikeways map</title>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/pmtiles@4.5.0/dist/pmtiles.js"></script>
+</head>
+<body>
+  <div id="map"></div>
+  <aside id="panel">
+    <h1 id="title"></h1>
+    <label class="field">Dataset <select id="source"></select></label>
+    <div id="cities"></div>
+    <h2>CAN-BICS class</h2>
+    <ul id="legend"></ul>
+    <p class="hint">Click a segment for details.</p>
+  </aside>
+  <script src="app.js"></script>
+</body>
+</html>

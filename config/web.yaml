@@ -1,0 +1,26 @@
+# Web app settings. Exported to web/data/config.json by the pipeline.
+
+title: Bikeways map
+basemap: https://tiles.openfreemap.org/styles/positron
+
+# Initial view + quick-jump cities.
+cities:
+  - {name: Ottawa,   center: [-75.70, 45.40], zoom: 11}
+  - {name: Montreal, center: [-73.63, 45.52], zoom: 11}
+
+# Fields shown when a segment is clicked, in order. key = common column name.
+popup:
+  - {key: source_class,           label: Source class}
+  - {key: source_class_secondary, label: Source class (secondary)}
+  - {key: surface_type,           label: Surface}
+  - {key: width_m,                label: Width (m)}
+  - {key: length_km_source,       label: Length (km)}
+  - {key: municipality,           label: Municipality}
+  - {key: source_record_id,       label: Source record id}
+  - {key: id,                     label: Segment id}
+
+# External links shown in the popup. {lat},{lng} = point on the segment nearest the click;
+# {heading} = direction of travel along the segment (degrees).
+links:
+  - label: Open Street View
+    url: "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={lat},{lng}&heading={heading}"

@@ -1,0 +1,45 @@
+:root {
+  --bg: #ffffff;
+  --fg: #1d1d1f;
+  --muted: #6e6e73;
+  --border: #d2d2d7;
+  --hover: #f2f2f5;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); }
+#map { position: absolute; inset: 0; }
+
+#panel {
+  position: absolute; top: 12px; left: 12px; width: 260px; max-height: calc(100% - 24px);
+  overflow: auto; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px 14px; box-shadow: 0 2px 8px rgb(0 0 0 / .08);
+}
+h1 { font-size: 16px; margin: 0 0 10px; }
+h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 14px 0 6px; }
+.field { display: flex; flex-direction: column; gap: 4px; color: var(--muted); font-size: 12px; }
+select { font: inherit; padding: 4px; }
+#cities { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+#cities button {
+  font: inherit; padding: 4px 10px; border: 1px solid var(--border); border-radius: 14px;
+  background: var(--bg); cursor: pointer;
+}
+#cities button:hover { background: var(--hover); }
+
+#legend { list-style: none; margin: 0; padding: 0; }
+#legend label { display: flex; align-items: center; gap: 8px; padding: 3px 0; cursor: pointer; }
+.swatch { width: 18px; height: 4px; border-radius: 2px; flex: none; }
+.comfort { margin-left: auto; color: var(--muted); font-size: 11px; }
+.hint { color: var(--muted); font-size: 12px; margin: 12px 0 0; }
+
+.popup h3 { margin: 0 0 6px; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+.popup table { border-collapse: collapse; font-size: 12px; }
+.popup th { text-align: left; color: var(--muted); font-weight: normal; padding: 1px 10px 1px 0; vertical-align: top; }
+.popup td { padding: 1px 0; word-break: break-all; }
+.popup .links { margin-top: 8px; display: flex; gap: 10px; font-size: 12px; }
+.maplibregl-popup-content { padding: 10px 12px; }
+
+@media (max-width: 600px) {
+  #panel { top: auto; bottom: 12px; left: 12px; right: 12px; width: auto; max-height: 40%; }
+}
