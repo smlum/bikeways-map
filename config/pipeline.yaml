@@ -2,10 +2,10 @@
 
 build_dir: data/build
 
-# Restrict processing to these municipalities (CCND naming).
+# Restrict processing to these place ids (see config/places.yaml).
 # Remove or set to [] to process all of Canada.
 scope:
-  municipalities: [Ottawa, Montreal]
+  places: []
 
 # All tilesets share one layer name so the web style works across datasets/vintages.
 tiles:

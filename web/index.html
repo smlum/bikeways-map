@@ -14,8 +14,16 @@
   <aside id="panel">
     <h1 id="title"></h1>
     <label class="field">Dataset <select id="source"></select></label>
-    <div id="cities"></div>
-    <h2>CAN-BICS class</h2>
+    <label class="field">City
+      <input id="city-search" list="city-list" placeholder="Search a city…" autocomplete="off">
+      <datalist id="city-list"></datalist>
+    </label>
+    <div class="seg-toggle" role="radiogroup" aria-label="Colour by">
+      <span>Colour by</span>
+      <button data-mode="class" aria-pressed="true">CAN-BICS class</button>
+      <button data-mode="source" aria-pressed="false">Source class</button>
+    </div>
+    <h2 id="legend-title">CAN-BICS class</h2>
     <ul id="legend"></ul>
     <p class="hint">Click a segment for details.</p>
   </aside>

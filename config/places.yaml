@@ -1,0 +1,612 @@
+# Place registry. One entry per place (key = place id used across pipeline + web).
+# `names` records how each source's files spell the place, so joins are explicit, not inferred.
+# Seeded by scripts/seed_places.py; edit freely (display names, accents, CSD lists later).
+places:
+  abbotsford:
+    name: Abbotsford
+    province: bc
+    names:
+      ccnd_2024:
+        data: Abbotsford
+        metadata: abbotsford
+        dictionary: abbotsford
+  ajax:
+    name: Ajax
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Ajax
+        metadata: ajax
+        dictionary: ajax
+  barrie:
+    name: Barrie
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Barrie
+        metadata: barrie
+        dictionary: barrie
+  belleville:
+    name: Belleville
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Belleville
+        metadata: belleville
+        dictionary: belleville
+  brampton:
+    name: Brampton
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Brampton
+        metadata: brampton
+        dictionary: brampton
+  burlington:
+    name: Burlington
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Burlington
+        metadata: burlington
+        dictionary: burlington
+  burnaby:
+    name: Burnaby
+    province: bc
+    names:
+      ccnd_2024:
+        data: Burnaby
+        metadata: burnaby
+        dictionary: burnaby
+  calgary:
+    name: Calgary
+    province: ab
+    names:
+      ccnd_2024:
+        data: Calgary
+        metadata: calgary
+        dictionary: calgary
+  cambridge:
+    name: Cambridge
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Cambridge
+        metadata: cambridge
+        dictionary: cambridge
+  campbell_river:
+    name: Campbell River
+    province: bc
+    names:
+      ccnd_2024:
+        data: Campbell River
+        metadata: campbell_river
+        dictionary: campbell_river
+  charlottetown:
+    name: Charlottetown
+    province: pe
+    names:
+      ccnd_2024:
+        data: Charlottetown
+        metadata: charlottetown
+        dictionary: charlottetown
+  chilliwack:
+    name: Chilliwack
+    province: bc
+    names:
+      ccnd_2024:
+        data: Chilliwack
+        metadata: chilliwack
+        dictionary: chilliwack
+  coquitlam:
+    name: Coquitlam
+    province: bc
+    names:
+      ccnd_2024:
+        data: Coquitlam
+        metadata: coquitlam
+        dictionary: coquitlam
+  cornwall:
+    name: Cornwall
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Cornwall
+        metadata: cornwall
+        dictionary: cornwall
+  courtenay:
+    name: Courtenay
+    province: bc
+    names:
+      ccnd_2024:
+        data: Courtenay
+        metadata: courtenay
+        dictionary: courtenay
+  drummondville:
+    name: Drummondville
+    province: qc
+    names:
+      ccnd_2024:
+        data: Drummondville
+        metadata: drummondville
+        dictionary: drummondville
+  edmonton:
+    name: Edmonton
+    province: ab
+    names:
+      ccnd_2024:
+        data: Edmonton
+        metadata: edmonton
+        dictionary: edmonton
+  essex_county:
+    name: Essex County
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Essex County
+        metadata: essex_county
+        dictionary: essex_county
+  fredericton:
+    name: Fredericton
+    province: nb
+    names:
+      ccnd_2024:
+        data: Fredericton
+        metadata: fredericton
+        dictionary: fredericton
+  gatineau:
+    name: Gatineau
+    province: qc
+    names:
+      ccnd_2024:
+        data: Gatineau
+        metadata: gatineau
+        dictionary: gatineau
+  greater_sudbury:
+    name: Greater Sudbury
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Greater Sudbury
+        metadata: greater_sudbury
+        dictionary: greater_sudbury
+  guelph:
+    name: Guelph
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Guelph
+        metadata: guelph
+        dictionary: guelph
+  halifax:
+    name: Halifax
+    province: ns
+    names:
+      ccnd_2024:
+        data: Halifax
+        metadata: halifax
+        dictionary: halifax
+  hamilton:
+    name: Hamilton
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Hamilton
+        metadata: hamilton
+        dictionary: hamilton
+  kamloops:
+    name: Kamloops
+    province: bc
+    names:
+      ccnd_2024:
+        data: Kamloops
+        metadata: kamloops
+        dictionary: kamloops
+  kelowna:
+    name: Kelowna
+    province: bc
+    names:
+      ccnd_2024:
+        data: Kelowna
+        metadata: kelowna
+        dictionary: kelowna
+  kingston:
+    name: Kingston
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Kingston
+        metadata: kingston
+        dictionary: kingston
+  kitchener:
+    name: Kitchener
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Kitchener
+        metadata: kitchener
+        dictionary: kitchener
+  langley:
+    name: Langley
+    province: bc
+    names:
+      ccnd_2024:
+        data: Langley
+        metadata: langley
+        dictionary: langley
+  laval:
+    name: Laval
+    province: qc
+    names:
+      ccnd_2024:
+        data: Laval
+        metadata: laval
+        dictionary: laval
+  levis:
+    name: Lévis
+    province: qc
+    names:
+      ccnd_2024:
+        data: Levis
+        metadata: levis
+        dictionary: levis
+  london:
+    name: London
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: London
+        metadata: london
+        dictionary: london
+  longueuil:
+    name: Longueuil
+    province: qc
+    names:
+      ccnd_2024:
+        data: Longueuil
+        metadata: longueuil
+        dictionary: longueuil
+  maple_ridge:
+    name: Maple Ridge
+    province: bc
+    names:
+      ccnd_2024:
+        data: Maple Ridge
+        metadata: maple_ridge
+        dictionary: maple_ridge
+  milton:
+    name: Milton
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Milton
+        metadata: milton
+        dictionary: milton
+  mississauga:
+    name: Mississauga
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Mississauga
+        metadata: mississauga
+        dictionary: mississauga
+  moncton:
+    name: Moncton
+    province: nb
+    names:
+      ccnd_2024:
+        data: Moncton
+        metadata: moncton
+        dictionary: moncton
+  montreal:
+    name: Montréal
+    province: qc
+    names:
+      ccnd_2024:
+        data: Montreal
+        metadata: montreal
+        dictionary: montreal
+  niagara_falls:
+    name: Niagara Falls
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Niagara Falls
+        metadata: niagara_falls
+        dictionary: niagara_falls
+  north_vancouver:
+    name: North Vancouver
+    province: bc
+    names:
+      ccnd_2024:
+        data: North Vancouver
+        metadata: north_vancouver
+        dictionary: north_vancouver
+  oakville:
+    name: Oakville
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Oakville
+        metadata: oakville
+        dictionary: oakville
+  orangeville:
+    name: Orangeville
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Orangeville
+        metadata: orangeville
+        dictionary: orangeville
+  ottawa:
+    name: Ottawa
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Ottawa
+        metadata: ottawa
+        dictionary: ottawa
+  oxford_county:
+    name: Oxford County
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Oxford County
+        metadata: oxford_county
+        dictionary: oxford_county
+  penticton:
+    name: Penticton
+    province: bc
+    names:
+      ccnd_2024:
+        data: Penticton
+        metadata: penticton
+        dictionary: penticton
+  peterborough:
+    name: Peterborough
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Peterborough
+        metadata: peterborough
+        dictionary: peterborough
+  port_moody:
+    name: Port Moody
+    province: bc
+    names:
+      ccnd_2024:
+        data: Port Moody
+        metadata: port_moody
+        dictionary: port_moody
+  prince_george:
+    name: Prince George
+    province: bc
+    names:
+      ccnd_2024:
+        data: Prince George
+        metadata: prince_george
+        dictionary: prince_george
+  quebec_city:
+    name: Québec
+    province: qc
+    names:
+      ccnd_2024:
+        data: Quebec City
+        metadata: quebec_city
+        dictionary: quebec_city
+  regina:
+    name: Regina
+    province: sk
+    names:
+      ccnd_2024:
+        data: Regina
+        metadata: regina
+        dictionary: regina
+  repentigny:
+    name: Repentigny
+    province: qc
+    names:
+      ccnd_2024:
+        data: Repentigny
+        metadata: repentigny
+        dictionary: repentigny
+  rimouski:
+    name: Rimouski
+    province: qc
+    names:
+      ccnd_2024:
+        data: Rimouski
+        metadata: rimouski
+        dictionary: rimouski
+  rouyn-noranda:
+    name: Rouyn-Noranda
+    province: qc
+    names:
+      ccnd_2024:
+        data: Rouyn-Noranda
+        metadata: rouyn-noranda
+        dictionary: rouyn-noranda
+  saguenay:
+    name: Saguenay
+    province: qc
+    names:
+      ccnd_2024:
+        data: Saguenay
+        metadata: saguenay
+        dictionary: saguenay
+  saskatoon:
+    name: Saskatoon
+    province: sk
+    names:
+      ccnd_2024:
+        data: Saskatoon
+        metadata: saskatoon
+        dictionary: saskatoon
+  shawinigan:
+    name: Shawinigan
+    province: qc
+    names:
+      ccnd_2024:
+        data: Shawinigan
+        metadata: shawinigan
+        dictionary: shawinigan
+  sherbrooke:
+    name: Sherbrooke
+    province: qc
+    names:
+      ccnd_2024:
+        data: Sherbrooke
+        metadata: sherbrooke
+        dictionary: sherbrooke
+  squamish:
+    name: Squamish
+    province: bc
+    names:
+      ccnd_2024:
+        data: Squamish
+        metadata: squamish
+        dictionary: squamish
+  st_john:
+    name: Saint John
+    province: nb
+    names:
+      ccnd_2024:
+        data: St John
+        metadata: st_john
+        dictionary: st_john
+  st_johns:
+    name: St John's
+    province: nl
+    names:
+      ccnd_2024:
+        data: St John's
+        metadata: st_johns
+        dictionary: st_johns
+  surrey:
+    name: Surrey
+    province: bc
+    names:
+      ccnd_2024:
+        data: Surrey
+        metadata: surrey
+        dictionary: surrey
+  toronto:
+    name: Toronto
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Toronto
+        metadata: toronto
+        dictionary: toronto
+  trois-rivières:
+    name: Trois-Rivières
+    province: qc
+    names:
+      ccnd_2024:
+        data: Trois-Rivières
+        metadata: trois-rivières
+        dictionary: trois-rivières
+  vancouver:
+    name: Vancouver
+    province: bc
+    names:
+      ccnd_2024:
+        data: Vancouver
+        metadata: vancouver
+        dictionary: vancouver
+  vernon:
+    name: Vernon
+    province: bc
+    names:
+      ccnd_2024:
+        data: Vernon
+        metadata: vernon
+        dictionary: vernon
+  victoria:
+    name: Victoria
+    province: bc
+    names:
+      ccnd_2024:
+        data: Victoria
+        metadata: victoria
+        dictionary: victoria
+  waterloo:
+    name: Waterloo
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Waterloo
+        metadata: waterloo
+        dictionary: waterloo
+  west_vancouver:
+    name: West Vancouver
+    province: bc
+    names:
+      ccnd_2024:
+        data: West Vancouver
+        metadata: west_vancouver
+        dictionary: west_vancouver
+  whitby:
+    name: Whitby
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Whitby
+        metadata: whitby
+        dictionary: whitby
+  white_rock:
+    name: White Rock
+    province: bc
+    names:
+      ccnd_2024:
+        data: White Rock
+        metadata: white rock
+        dictionary: white rock
+  whitehorse:
+    name: Whitehorse
+    province: yt
+    names:
+      ccnd_2024:
+        data: Whitehorse
+        metadata: whitehorse
+        dictionary: whitehorse
+  windsor:
+    name: Windsor
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: Windsor
+        metadata: windsor
+        dictionary: windsor
+  winnipeg:
+    name: Winnipeg
+    province: mb
+    names:
+      ccnd_2024:
+        data: Winnipeg
+        metadata: winnipeg
+        dictionary: winnipeg
+  yellowknife:
+    name: Yellowknife
+    province: nt
+    names:
+      ccnd_2024:
+        data: Yellowknife
+        metadata: yellowknife
+        dictionary: yellowknife
+  york_region:
+    name: York Region
+    province: 'on'
+    names:
+      ccnd_2024:
+        data: York Region
+        metadata: york_region
+        dictionary: york_region
+unmatched:
+  ccnd_2024:
+    metadata:
+    - kitchener_mup
+    dictionary:
+    - kitchener_mup
+    - markham
+    - newmarket

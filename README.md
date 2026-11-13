@@ -28,7 +28,8 @@ Preview locally (needs Range support for PMTiles):
 python scripts/serve.py   # http://localhost:8000
 ```
 
-Config lives in `config/` (sources, classes, scope, tile settings).
+Config lives in `config/`: sources, classes, places (name mapping across files), scope, tile and web settings.
+New source or vintage: add to `sources.yaml`, then `python scripts/seed_places.py <source_id>` and review `places.yaml`.
 
 ## Structure
 
