@@ -1,0 +1,16 @@
+# data (raw downloads + build outputs)
+data/
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# tiles
+*.pmtiles
+*.mbtiles
+
+# os / editor
+.DS_Store
+.vscode/
