@@ -1,0 +1,19 @@
+# Global pipeline settings.
+
+build_dir: data/build
+
+# Restrict processing to these municipalities (CCND naming).
+# Remove or set to [] to process all of Canada.
+scope:
+  municipalities: [Ottawa, Montreal]
+
+# All tilesets share one layer name so the web style works across datasets/vintages.
+tiles:
+  layer: network
+  args:
+    - --maximum-zoom=g
+    - --minimum-zoom=4
+    - --drop-densest-as-needed
+    - --extend-zooms-if-still-dropping
+    - --force
+    - --quiet

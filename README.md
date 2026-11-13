@@ -15,12 +15,22 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Pipeline
+
+```sh
+python -m pipeline.run                    # all sources, all steps
+python -m pipeline.run ccnd_2024 --steps prepare summaries
+```
+
+Config lives in `config/` (sources, classes, scope, tile settings).
+
 ## Structure
 
 ```
 data/raw/<dataset>/<vintage>/   source downloads (gitignored)
 data/build/                     processed outputs / PMTiles
-pipeline/                       data prep scripts
+config/                         YAML config
+pipeline/                       data prep (prepare → tiles → summaries)
 web/                            MapLibre app
 ```
 

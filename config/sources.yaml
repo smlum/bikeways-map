@@ -1,0 +1,29 @@
+# One entry per dataset + vintage. Key = source id, used for output names.
+# `columns` maps source column -> common column name. Unlisted columns are dropped.
+# Common names: class, source_class, source_class_secondary, surface_type, width_m,
+#               length_km_source, municipality, province, csdname, cmaname, source_record_id
+
+ccnd_2024:
+  dataset: ccnd
+  vintage: 2024
+  label: Canadian Cycling Network Database (2024)
+  path: data/raw/ccnd/2024/canadian_cycling_network_database/cycle_network_2024.gpkg
+  layer: canbics_2024
+  municipality_field: municipality
+  columns:
+    canbics_class: class
+    source_class: source_class
+    source_class_secondary: source_class_secondary
+    surface_type: surface_type
+    width_m: width_m
+    length_km: length_km_source
+    municipality: municipality
+    province_territory: province
+    csdname: csdname
+    cmaname: cmaname
+    record_id: source_record_id
+  # Per-municipality provenance (provider, licence, …), joined on municipality name.
+  metadata:
+    path: data/raw/ccnd/2024/canadian_cycling_network_database/data_sources.csv
+    key: municipality
+    fields: [provider, year_updated, source_url, license, attribution]

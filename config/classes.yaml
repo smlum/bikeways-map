@@ -1,0 +1,15 @@
+# CAN-BICS classes, shared by pipeline and web app. Order = legend order.
+# comfort per CAN-BICS: high / medium / low / non_conforming
+
+classes:
+  - {slug: cycle_track,          label: Cycle track,          comfort: high,           color: "#0b6e4f"}
+  - {slug: local_street_bikeway, label: Local street bikeway, comfort: high,           color: "#57cc99"}
+  - {slug: bike_path,            label: Bike path,            comfort: high,           color: "#2a9d8f"}
+  - {slug: multi_use_path,       label: Multi-use path,       comfort: medium,         color: "#3a86ff"}
+  - {slug: painted_bike_lane,    label: Painted bike lane,    comfort: low,            color: "#f4a261"}
+  - {slug: gravel_trail,         label: Gravel trail,         comfort: non_conforming, color: "#a47148"}
+  - {slug: shared_roadway,       label: Shared roadway,       comfort: non_conforming, color: "#b5179e"}
+  - {slug: major_shared_roadway, label: Major shared roadway, comfort: non_conforming, color: "#e63946"}
+
+# Fallback for values not listed above.
+unknown: {slug: unknown, label: Unknown, comfort: unknown, color: "#888888"}
