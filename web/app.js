@@ -179,6 +179,7 @@ async function main() {
     const url = new URL(location.href);
     url.searchParams.set("city", id);
     history.replaceState(null, "", url);
+    try { localStorage.setItem("lastCity", id); } catch {} // so the Map tab returns here
     refresh();
   }
 
@@ -215,7 +216,9 @@ async function main() {
       },
     }, beforeId);
     // Initial city: ?city=, else keep current, else config default. Fit only if the URL has no view.
-    const wanted = new URLSearchParams(location.search).get("city") || state.city || cfg.initial_city;
+    let last = null;
+    try { last = localStorage.getItem("lastCity"); } catch {}
+    const wanted = new URLSearchParams(location.search).get("city") || state.city || last || cfg.initial_city;
     state.city = null;
     setCity(state.summary?.places[wanted] ? wanted : Object.keys(state.summary?.places || {})[0],
       { fit: !hadViewInUrl });
