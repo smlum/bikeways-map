@@ -10,6 +10,11 @@ places:
         data: Abbotsford
         metadata: abbotsford
         dictionary: abbotsford
+    csds:
+    - uid: '5909052'
+      name: Abbotsford
+    - uid: '5909878'
+      name: Matsqui Main 2
   ajax:
     name: Ajax
     province: 'on'
@@ -18,6 +23,9 @@ places:
         data: Ajax
         metadata: ajax
         dictionary: ajax
+    csds:
+    - uid: '3518005'
+      name: Ajax
   barrie:
     name: Barrie
     province: 'on'
@@ -26,6 +34,9 @@ places:
         data: Barrie
         metadata: barrie
         dictionary: barrie
+    csds:
+    - uid: '3543042'
+      name: Barrie
   belleville:
     name: Belleville
     province: 'on'
@@ -34,6 +45,11 @@ places:
         data: Belleville
         metadata: belleville
         dictionary: belleville
+    csds:
+    - uid: '3512005'
+      name: Belleville
+    - uid: '3512020'
+      name: Stirling-Rawdon
   brampton:
     name: Brampton
     province: 'on'
@@ -42,6 +58,9 @@ places:
         data: Brampton
         metadata: brampton
         dictionary: brampton
+    csds:
+    - uid: '3521010'
+      name: Brampton
   burlington:
     name: Burlington
     province: 'on'
@@ -50,6 +69,9 @@ places:
         data: Burlington
         metadata: burlington
         dictionary: burlington
+    csds:
+    - uid: '3524002'
+      name: Burlington
   burnaby:
     name: Burnaby
     province: bc
@@ -58,6 +80,9 @@ places:
         data: Burnaby
         metadata: burnaby
         dictionary: burnaby
+    csds:
+    - uid: '5915025'
+      name: Burnaby
   calgary:
     name: Calgary
     province: ab
@@ -66,6 +91,9 @@ places:
         data: Calgary
         metadata: calgary
         dictionary: calgary
+    csds:
+    - uid: '4806016'
+      name: Calgary
   cambridge:
     name: Cambridge
     province: 'on'
@@ -74,6 +102,9 @@ places:
         data: Cambridge
         metadata: cambridge
         dictionary: cambridge
+    csds:
+    - uid: '3530010'
+      name: Cambridge
   campbell_river:
     name: Campbell River
     province: bc
@@ -82,6 +113,11 @@ places:
         data: Campbell River
         metadata: campbell_river
         dictionary: campbell_river
+    csds:
+    - uid: '5924034'
+      name: Campbell River
+    - uid: '5924804'
+      name: Campbell River 11
   charlottetown:
     name: Charlottetown
     province: pe
@@ -90,6 +126,9 @@ places:
         data: Charlottetown
         metadata: charlottetown
         dictionary: charlottetown
+    csds:
+    - uid: '1102075'
+      name: Charlottetown
   chilliwack:
     name: Chilliwack
     province: bc
@@ -98,6 +137,17 @@ places:
         data: Chilliwack
         metadata: chilliwack
         dictionary: chilliwack
+    csds:
+    - uid: '5909020'
+      name: Chilliwack
+    - uid: '5909830'
+      name: Tzeachten 13
+    - uid: '5909885'
+      name: Squiaala
+    - uid: '5909884'
+      name: Skowkale
+    - uid: '5909824'
+      name: Skwah 4
   coquitlam:
     name: Coquitlam
     province: bc
@@ -106,6 +156,9 @@ places:
         data: Coquitlam
         metadata: coquitlam
         dictionary: coquitlam
+    csds:
+    - uid: '5915034'
+      name: Coquitlam
   cornwall:
     name: Cornwall
     province: 'on'
@@ -114,6 +167,9 @@ places:
         data: Cornwall
         metadata: cornwall
         dictionary: cornwall
+    csds:
+    - uid: '3501012'
+      name: Cornwall
   courtenay:
     name: Courtenay
     province: bc
@@ -122,6 +178,9 @@ places:
         data: Courtenay
         metadata: courtenay
         dictionary: courtenay
+    csds:
+    - uid: '5926010'
+      name: Courtenay
   drummondville:
     name: Drummondville
     province: qc
@@ -130,6 +189,9 @@ places:
         data: Drummondville
         metadata: drummondville
         dictionary: drummondville
+    csds:
+    - uid: '2449058'
+      name: Drummondville
   edmonton:
     name: Edmonton
     province: ab
@@ -138,6 +200,11 @@ places:
         data: Edmonton
         metadata: edmonton
         dictionary: edmonton
+    csds:
+    - uid: '4811061'
+      name: Edmonton
+    - uid: '4811062'
+      name: St. Albert
   essex_county:
     name: Essex County
     province: 'on'
@@ -146,6 +213,9 @@ places:
         data: Essex County
         metadata: essex_county
         dictionary: essex_county
+    csds:
+    - uid: '3537048'
+      name: Tecumseh
   fredericton:
     name: Fredericton
     province: nb
@@ -154,6 +224,9 @@ places:
         data: Fredericton
         metadata: fredericton
         dictionary: fredericton
+    csds:
+    - uid: '1310032'
+      name: Fredericton
   gatineau:
     name: Gatineau
     province: qc
@@ -162,6 +235,9 @@ places:
         data: Gatineau
         metadata: gatineau
         dictionary: gatineau
+    csds:
+    - uid: '2481017'
+      name: Gatineau
   greater_sudbury:
     name: Greater Sudbury
     province: 'on'
@@ -170,6 +246,9 @@ places:
         data: Greater Sudbury
         metadata: greater_sudbury
         dictionary: greater_sudbury
+    csds:
+    - uid: '3553005'
+      name: Greater Sudbury / Grand Sudbury
   guelph:
     name: Guelph
     province: 'on'
@@ -178,6 +257,9 @@ places:
         data: Guelph
         metadata: guelph
         dictionary: guelph
+    csds:
+    - uid: '3523008'
+      name: Guelph
   halifax:
     name: Halifax
     province: ns
@@ -186,6 +268,9 @@ places:
         data: Halifax
         metadata: halifax
         dictionary: halifax
+    csds:
+    - uid: '1209034'
+      name: Halifax
   hamilton:
     name: Hamilton
     province: 'on'
@@ -194,6 +279,13 @@ places:
         data: Hamilton
         metadata: hamilton
         dictionary: hamilton
+    csds:
+    - uid: '3525005'
+      name: Hamilton
+    - uid: '3526021'
+      name: West Lincoln
+    - uid: '3526065'
+      name: Grimsby
   kamloops:
     name: Kamloops
     province: bc
@@ -202,6 +294,9 @@ places:
         data: Kamloops
         metadata: kamloops
         dictionary: kamloops
+    csds:
+    - uid: '5933042'
+      name: Kamloops
   kelowna:
     name: Kelowna
     province: bc
@@ -210,6 +305,11 @@ places:
         data: Kelowna
         metadata: kelowna
         dictionary: kelowna
+    csds:
+    - uid: '5935010'
+      name: Kelowna
+    - uid: '5935801'
+      name: Duck Lake 7
   kingston:
     name: Kingston
     province: 'on'
@@ -218,6 +318,9 @@ places:
         data: Kingston
         metadata: kingston
         dictionary: kingston
+    csds:
+    - uid: '3510010'
+      name: Kingston
   kitchener:
     name: Kitchener
     province: 'on'
@@ -226,6 +329,9 @@ places:
         data: Kitchener
         metadata: kitchener
         dictionary: kitchener
+    csds:
+    - uid: '3530013'
+      name: Kitchener
   langley:
     name: Langley
     province: bc
@@ -234,6 +340,9 @@ places:
         data: Langley
         metadata: langley
         dictionary: langley
+    csds:
+    - uid: '5915002'
+      name: Langley
   laval:
     name: Laval
     province: qc
@@ -242,6 +351,9 @@ places:
         data: Laval
         metadata: laval
         dictionary: laval
+    csds:
+    - uid: '2465005'
+      name: Laval
   levis:
     name: Lévis
     province: qc
@@ -250,6 +362,9 @@ places:
         data: Levis
         metadata: levis
         dictionary: levis
+    csds:
+    - uid: '2425213'
+      name: Lévis
   london:
     name: London
     province: 'on'
@@ -258,6 +373,9 @@ places:
         data: London
         metadata: london
         dictionary: london
+    csds:
+    - uid: '3539036'
+      name: London
   longueuil:
     name: Longueuil
     province: qc
@@ -266,6 +384,9 @@ places:
         data: Longueuil
         metadata: longueuil
         dictionary: longueuil
+    csds:
+    - uid: '2458227'
+      name: Longueuil
   maple_ridge:
     name: Maple Ridge
     province: bc
@@ -274,6 +395,11 @@ places:
         data: Maple Ridge
         metadata: maple_ridge
         dictionary: maple_ridge
+    csds:
+    - uid: '5915075'
+      name: Maple Ridge
+    - uid: '5915070'
+      name: Pitt Meadows
   milton:
     name: Milton
     province: 'on'
@@ -282,6 +408,9 @@ places:
         data: Milton
         metadata: milton
         dictionary: milton
+    csds:
+    - uid: '3524009'
+      name: Milton
   mississauga:
     name: Mississauga
     province: 'on'
@@ -290,6 +419,9 @@ places:
         data: Mississauga
         metadata: mississauga
         dictionary: mississauga
+    csds:
+    - uid: '3521005'
+      name: Mississauga
   moncton:
     name: Moncton
     province: nb
@@ -298,6 +430,9 @@ places:
         data: Moncton
         metadata: moncton
         dictionary: moncton
+    csds:
+    - uid: '1307022'
+      name: Moncton
   montreal:
     name: Montréal
     province: qc
@@ -306,6 +441,35 @@ places:
         data: Montreal
         metadata: montreal
         dictionary: montreal
+    csds:
+    - uid: '2466023'
+      name: Montréal
+    - uid: '2466107'
+      name: Beaconsfield
+    - uid: '2466097'
+      name: Pointe-Claire
+    - uid: '2466142'
+      name: Dollard-Des Ormeaux
+    - uid: '2466087'
+      name: Dorval
+    - uid: '2466058'
+      name: Côte-Saint-Luc
+    - uid: '2466102'
+      name: Kirkland
+    - uid: '2466117'
+      name: Sainte-Anne-de-Bellevue
+    - uid: '2466127'
+      name: Senneville
+    - uid: '2466072'
+      name: Mont-Royal
+    - uid: '2466032'
+      name: Westmount
+    - uid: '2466112'
+      name: Baie-D'Urfé
+    - uid: '2466007'
+      name: Montréal-Est
+    - uid: '2466047'
+      name: Montréal-Ouest
   niagara_falls:
     name: Niagara Falls
     province: 'on'
@@ -314,6 +478,9 @@ places:
         data: Niagara Falls
         metadata: niagara_falls
         dictionary: niagara_falls
+    csds:
+    - uid: '3526043'
+      name: Niagara Falls
   north_vancouver:
     name: North Vancouver
     province: bc
@@ -322,6 +489,17 @@ places:
         data: North Vancouver
         metadata: north_vancouver
         dictionary: north_vancouver
+    csds:
+    - uid: '5915046'
+      name: North Vancouver
+    - uid: '5915051'
+      name: North Vancouver
+    - uid: '5915806'
+      name: Burrard Inlet 3
+    - uid: '5915811'
+      name: Seymour Creek 2
+    - uid: '5915807'
+      name: Mission 1
   oakville:
     name: Oakville
     province: 'on'
@@ -330,6 +508,9 @@ places:
         data: Oakville
         metadata: oakville
         dictionary: oakville
+    csds:
+    - uid: '3524001'
+      name: Oakville
   orangeville:
     name: Orangeville
     province: 'on'
@@ -338,6 +519,9 @@ places:
         data: Orangeville
         metadata: orangeville
         dictionary: orangeville
+    csds:
+    - uid: '3522014'
+      name: Orangeville
   ottawa:
     name: Ottawa
     province: 'on'
@@ -346,6 +530,9 @@ places:
         data: Ottawa
         metadata: ottawa
         dictionary: ottawa
+    csds:
+    - uid: '3506008'
+      name: Ottawa
   oxford_county:
     name: Oxford County
     province: 'on'
@@ -354,6 +541,9 @@ places:
         data: Oxford County
         metadata: oxford_county
         dictionary: oxford_county
+    csds:
+    - uid: '3532018'
+      name: Ingersoll
   penticton:
     name: Penticton
     province: bc
@@ -362,6 +552,9 @@ places:
         data: Penticton
         metadata: penticton
         dictionary: penticton
+    csds:
+    - uid: '5907041'
+      name: Penticton
   peterborough:
     name: Peterborough
     province: 'on'
@@ -370,6 +563,9 @@ places:
         data: Peterborough
         metadata: peterborough
         dictionary: peterborough
+    csds:
+    - uid: '3515014'
+      name: Peterborough
   port_moody:
     name: Port Moody
     province: bc
@@ -378,6 +574,9 @@ places:
         data: Port Moody
         metadata: port_moody
         dictionary: port_moody
+    csds:
+    - uid: '5915043'
+      name: Port Moody
   prince_george:
     name: Prince George
     province: bc
@@ -386,6 +585,9 @@ places:
         data: Prince George
         metadata: prince_george
         dictionary: prince_george
+    csds:
+    - uid: '5953023'
+      name: Prince George
   quebec_city:
     name: Québec
     province: qc
@@ -394,6 +596,15 @@ places:
         data: Quebec City
         metadata: quebec_city
         dictionary: quebec_city
+    csds:
+    - uid: '2423027'
+      name: Québec
+    - uid: '2423072'
+      name: Saint-Augustin-de-Desmaures
+    - uid: '2423057'
+      name: L'Ancienne-Lorette
+    - uid: '2423802'
+      name: Wendake
   regina:
     name: Regina
     province: sk
@@ -402,6 +613,9 @@ places:
         data: Regina
         metadata: regina
         dictionary: regina
+    csds:
+    - uid: '4706027'
+      name: Regina
   repentigny:
     name: Repentigny
     province: qc
@@ -410,6 +624,11 @@ places:
         data: Repentigny
         metadata: repentigny
         dictionary: repentigny
+    csds:
+    - uid: '2460013'
+      name: Repentigny
+    - uid: '2460005'
+      name: Charlemagne
   rimouski:
     name: Rimouski
     province: qc
@@ -418,6 +637,9 @@ places:
         data: Rimouski
         metadata: rimouski
         dictionary: rimouski
+    csds:
+    - uid: '2410043'
+      name: Rimouski
   rouyn-noranda:
     name: Rouyn-Noranda
     province: qc
@@ -426,6 +648,9 @@ places:
         data: Rouyn-Noranda
         metadata: rouyn-noranda
         dictionary: rouyn-noranda
+    csds:
+    - uid: '2486042'
+      name: Rouyn-Noranda
   saguenay:
     name: Saguenay
     province: qc
@@ -434,6 +659,9 @@ places:
         data: Saguenay
         metadata: saguenay
         dictionary: saguenay
+    csds:
+    - uid: '2494068'
+      name: Saguenay
   saskatoon:
     name: Saskatoon
     province: sk
@@ -442,6 +670,9 @@ places:
         data: Saskatoon
         metadata: saskatoon
         dictionary: saskatoon
+    csds:
+    - uid: '4711066'
+      name: Saskatoon
   shawinigan:
     name: Shawinigan
     province: qc
@@ -450,6 +681,11 @@ places:
         data: Shawinigan
         metadata: shawinigan
         dictionary: shawinigan
+    csds:
+    - uid: '2436033'
+      name: Shawinigan
+    - uid: '2435035'
+      name: Hérouxville
   sherbrooke:
     name: Sherbrooke
     province: qc
@@ -458,6 +694,9 @@ places:
         data: Sherbrooke
         metadata: sherbrooke
         dictionary: sherbrooke
+    csds:
+    - uid: '2443027'
+      name: Sherbrooke
   squamish:
     name: Squamish
     province: bc
@@ -466,6 +705,15 @@ places:
         data: Squamish
         metadata: squamish
         dictionary: squamish
+    csds:
+    - uid: '5931006'
+      name: Squamish
+    - uid: '5931802'
+      name: Kowtain 17
+    - uid: '5931806'
+      name: Seaichem 16
+    - uid: '5931807'
+      name: Stawamus 24
   st_john:
     name: Saint John
     province: nb
@@ -474,6 +722,9 @@ places:
         data: St John
         metadata: st_john
         dictionary: st_john
+    csds:
+    - uid: '1301006'
+      name: Saint John
   st_johns:
     name: St John's
     province: nl
@@ -482,6 +733,9 @@ places:
         data: St John's
         metadata: st_johns
         dictionary: st_johns
+    csds:
+    - uid: '1001519'
+      name: St. John's
   surrey:
     name: Surrey
     province: bc
@@ -490,6 +744,9 @@ places:
         data: Surrey
         metadata: surrey
         dictionary: surrey
+    csds:
+    - uid: '5915004'
+      name: Surrey
   toronto:
     name: Toronto
     province: 'on'
@@ -498,6 +755,9 @@ places:
         data: Toronto
         metadata: toronto
         dictionary: toronto
+    csds:
+    - uid: '3520005'
+      name: Toronto
   trois-rivières:
     name: Trois-Rivières
     province: qc
@@ -506,6 +766,9 @@ places:
         data: Trois-Rivières
         metadata: trois-rivières
         dictionary: trois-rivières
+    csds:
+    - uid: '2437067'
+      name: Trois-Rivières
   vancouver:
     name: Vancouver
     province: bc
@@ -514,6 +777,11 @@ places:
         data: Vancouver
         metadata: vancouver
         dictionary: vancouver
+    csds:
+    - uid: '5915022'
+      name: Vancouver
+    - uid: '5915803'
+      name: Musqueam 2
   vernon:
     name: Vernon
     province: bc
@@ -522,6 +790,9 @@ places:
         data: Vernon
         metadata: vernon
         dictionary: vernon
+    csds:
+    - uid: '5937014'
+      name: Vernon
   victoria:
     name: Victoria
     province: bc
@@ -530,6 +801,9 @@ places:
         data: Victoria
         metadata: victoria
         dictionary: victoria
+    csds:
+    - uid: '5917034'
+      name: Victoria
   waterloo:
     name: Waterloo
     province: 'on'
@@ -538,6 +812,9 @@ places:
         data: Waterloo
         metadata: waterloo
         dictionary: waterloo
+    csds:
+    - uid: '3530016'
+      name: Waterloo
   west_vancouver:
     name: West Vancouver
     province: bc
@@ -546,6 +823,11 @@ places:
         data: West Vancouver
         metadata: west_vancouver
         dictionary: west_vancouver
+    csds:
+    - uid: '5915055'
+      name: West Vancouver
+    - uid: '5915808'
+      name: Capilano 5
   whitby:
     name: Whitby
     province: 'on'
@@ -554,6 +836,9 @@ places:
         data: Whitby
         metadata: whitby
         dictionary: whitby
+    csds:
+    - uid: '3518009'
+      name: Whitby
   white_rock:
     name: White Rock
     province: bc
@@ -562,6 +847,9 @@ places:
         data: White Rock
         metadata: white rock
         dictionary: white rock
+    csds:
+    - uid: '5915007'
+      name: White Rock
   whitehorse:
     name: Whitehorse
     province: yt
@@ -570,6 +858,9 @@ places:
         data: Whitehorse
         metadata: whitehorse
         dictionary: whitehorse
+    csds:
+    - uid: '6001009'
+      name: Whitehorse
   windsor:
     name: Windsor
     province: 'on'
@@ -578,6 +869,9 @@ places:
         data: Windsor
         metadata: windsor
         dictionary: windsor
+    csds:
+    - uid: '3537039'
+      name: Windsor
   winnipeg:
     name: Winnipeg
     province: mb
@@ -586,6 +880,9 @@ places:
         data: Winnipeg
         metadata: winnipeg
         dictionary: winnipeg
+    csds:
+    - uid: '4611040'
+      name: Winnipeg
   yellowknife:
     name: Yellowknife
     province: nt
@@ -594,6 +891,9 @@ places:
         data: Yellowknife
         metadata: yellowknife
         dictionary: yellowknife
+    csds:
+    - uid: '6106023'
+      name: Yellowknife
   york_region:
     name: York Region
     province: 'on'
@@ -602,6 +902,25 @@ places:
         data: York Region
         metadata: york_region
         dictionary: york_region
+    csds:
+    - uid: '3519028'
+      name: Vaughan
+    - uid: '3519036'
+      name: Markham
+    - uid: '3519038'
+      name: Richmond Hill
+    - uid: '3519054'
+      name: East Gwillimbury
+    - uid: '3519070'
+      name: Georgina
+    - uid: '3519044'
+      name: Whitchurch-Stouffville
+    - uid: '3519049'
+      name: King
+    - uid: '3519046'
+      name: Aurora
+    - uid: '3519048'
+      name: Newmarket
 unmatched:
   ccnd_2024:
     metadata:

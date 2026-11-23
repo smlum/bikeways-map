@@ -1,0 +1,14 @@
+# Dataset pairs to match piece-by-piece (pipeline/compare.py). Both sides are limited to each
+# place's profile area (CSD list in places.yaml).
+#   piece_m:     networks are cut into pieces of about this length before matching
+#   tolerance_m: a piece "matches" the other dataset if any of its lines is within this distance
+# Piece status: agree (a line of the same class within tolerance) | differs (only other classes
+# within tolerance; nearest one recorded) | only (nothing within tolerance).
+
+defaults:
+  piece_m: 20
+  tolerance_m: 20
+
+pairs:
+  - {a: ccnd_2024, b: osm_2024}
+  # - {a: osm_2024, b: osm_2026}  # disabled with osm_2026

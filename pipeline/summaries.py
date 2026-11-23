@@ -14,7 +14,9 @@ from pipeline.lib.text import name_key
 
 
 def _metadata(source_id: str, src: dict) -> dict:
-    """{place_id: provenance fields}."""
+    """{place_id: provenance fields}. A source-wide `provenance` block applies to every place."""
+    if "provenance" in src:
+        return {pid: dict(src["provenance"]) for pid in places.registry()}
     meta = src.get("metadata")
     if not meta:
         return {}
@@ -47,6 +49,8 @@ def _crosswalk(g: pd.DataFrame, dic: pd.DataFrame | None) -> list[dict]:
     dic = dic if dic is not None else pd.DataFrame(columns=["_sc", "source_class", "dict_class", "example_url"])
     dic_by_sc = dic.set_index("_sc")
     g = g.assign(_sc=name_key(g["source_class"]))
+    if "source_class_secondary" not in g.columns:
+        g["source_class_secondary"] = None
     n_classes = g.groupby("_sc")["class"].nunique()
     sec = g["source_class_secondary"].fillna("\0")
     by_spelling = g.groupby(["_sc", "source_class"])["class"].nunique().groupby("_sc").max() == 1
@@ -109,14 +113,32 @@ def run(source_id: str) -> None:
     out = {"source": source_id, "dataset": src["dataset"], "vintage": src["vintage"],
            "label": src["label"], "places": {}}
 
-    for pid, g in df.groupby("place"):
+    area_csds = places.csds()
+
+    def area_block(pid, g):
+        """km inside the place's profile area (its CSD list), for like-for-like comparison across sources."""
+        uids = set(area_csds.get(pid, []))
+        if not uids or "csd_uid" not in g.columns:
+            return None
+        inside = g[g["csd_uid"].isin(uids)]
+        by = inside.groupby("class")["length_km_source"].sum()
+        names = {str(c["uid"]): c["name"] for c in reg[pid].get("csds", [])}
+        return {
+            "csds": [{"uid": u, "name": names.get(u, u)} for u in sorted(uids)],
+            "total_km": round(inside["length_km_source"].sum(), 1),
+            "outside_km": round(g["length_km_source"].sum() - inside["length_km_source"].sum(), 1),
+            "by_class_km": by.reindex([c for c in order if c in by.index]).round(1).to_dict(),
+        }
+
+    for pid, g in df.dropna(subset=["place"]).groupby("place"):
         by_class = g.groupby("class")["length_km_source"].sum()
         by_class = by_class.reindex([c for c in order if c in by_class.index]
                                     + [c for c in by_class.index if c not in order])
         out["places"][pid] = {
             "name": reg[pid]["name"],
             "province": reg[pid].get("province"),
-            "municipality": g["municipality"].iloc[0],
+            "municipality": g["municipality"].iloc[0] if "municipality" in g.columns else None,
+            "area": area_block(pid, g),
             "bounds": [round(v, 5) for v in gdf.loc[g.index].total_bounds],
             "total_km": round(g["length_km_source"].sum(), 1),
             "total_km_computed": round(g["length_km"].sum(), 1),

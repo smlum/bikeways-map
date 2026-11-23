@@ -6,22 +6,58 @@ basemap: https://tiles.openfreemap.org/styles/positron
 # Initial map view (overridden by the URL hash).
 initial_view: {center: [-75.70, 45.40], zoom: 11}
 
+# Map page dataset tabs. source = dataset id (sources.yaml); mode = class (CAN-BICS class) |
+# compare (see compare_key). source_classes: offer the "Source classes" breakdown (the city's own
+# categories under each CAN-BICS class).
+views:
+  - {id: ccnd,   label: CCND,         source: ccnd_2024, mode: class, source_classes: true}
+  - {id: osm,    label: OSM,          source: osm_2024,  mode: class}
+  - {id: compare, label: Compare,     source: ccnd_2024, mode: compare}
+
+# Compare mode: baseline `a` coloured by how each stretch matches `b` (config/comparisons.yaml;
+# pipeline/compare.py), plus `b`'s stretches that `a` doesn't have, drawn on top. The class key stays
+# in the panel, greyed, as a filter. Non-conforming
+# stretches missing from the other dataset, or non-conforming in both, are hidden unless the
+# "Include non-conforming" toggle is on.
+compare_key:
+  a: ccnd_2024
+  b: osm_2024
+  colors:
+    agree:   "#2f9e5a"  # matched, same class
+    differs: "#f07f13"  # matched, class differs
+    only_b: "#b49aae"  # missing in a (only in b): muted mauve-grey
+    only_a: "#93a6bd"  # missing in b (only in a): muted blue-grey
+
 # The map is locked to one city at a time (search box, clicking a segment, or ?city=<place id>).
 initial_city: ottawa
 # Opacity of segments outside the selected city.
-other_city_opacity: 0.3
+other_city_opacity: 0.25
 
 # Fields shown when a segment is clicked, in order. key = common column name.
 # Empty values are hidden unless show_empty: true (then shown as "not recorded").
 popup:
+  - {key: name,                   label: Name}
   - {key: source_class,           label: Source class}
   - {key: source_class_secondary, label: Source class (secondary)}
   - {key: surface_type,           label: Surface, show_empty: true}
-  - {key: width_m,                label: Width (m)}
-  - {key: municipality,           label: Municipality}
 
 # External links shown in the popup. {lat},{lng} = point on the segment nearest the click;
-# {heading} = direction of travel along the segment (degrees).
+# {heading} = direction of travel along the segment (degrees); {<field>} = a segment property.
+# `requires`: only shown when the dataset has that field.
 links:
   - label: Open Street View
     url: "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint={lat},{lng}&heading={heading}"
+  - label: Open in OpenStreetMap
+    url: "https://www.openstreetmap.org/way/{osm_id}"
+    requires: osm_id
+
+# Known data issues (config/issues.yaml) are shown in the city profile, labelled by type.
+issue_types:
+  wrong_class: Misclassified
+  missing: Missing infrastructure
+  other: Other
+
+# "Report an issue" link in the city profile: any submission form (e.g. a Google Form whose
+# responses go to a sheet; see scripts/import_issues.py). {city} and {source_class} are filled in,
+# URL-encoded. Leave unset to hide the link.
+# report_url: "https://docs.google.com/forms/d/e/<form id>/viewform?usp=pp_url&entry.111={city}&entry.222={source_class}"

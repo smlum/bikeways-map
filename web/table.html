@@ -2,31 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Compare cities</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Table</title>
+  <!-- The table now lives in the map page's expanded panel. -->
+  <script>location.replace("index.html?panel=table" + location.search.replace(/^\?/, "&"));</script>
+  <meta http-equiv="refresh" content="0; url=index.html?panel=table">
 </head>
-<body class="page">
-  <main>
-    <header class="page-head">
-      <div>
-        <h1>Bikeways map</h1>
-        <nav class="tabs"><a href="index.html">Map</a><a href="table.html" aria-current="page">Compare cities</a></nav>
-        <p class="muted" id="subtitle"></p>
-      </div>
-      <div class="controls">
-        <label class="field">Dataset <select id="source"></select></label>
-        <label class="field">Search <input id="q" type="search" placeholder="City or province…"></label>
-        <div class="seg-toggle" role="radiogroup" aria-label="Show">
-          <span>Show</span>
-          <button data-unit="km" aria-pressed="true">km</button>
-          <button data-unit="pct" aria-pressed="false">% of city</button>
-        </div>
-      </div>
-    </header>
-    <div class="table-wrap"><table id="cities" class="compare"></table></div>
-    <p class="muted small">Lengths are km as published. Click a column to sort, a row to open the city on the map.</p>
-  </main>
-  <script src="table.js"></script>
-</body>
+<body></body>
 </html>

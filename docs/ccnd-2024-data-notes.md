@@ -37,3 +37,13 @@ Audit of `cycle_network_2024.gpkg` + companion CSVs (national, 82,115 rows, ~18,
 7. **Explicit nulls:** no sentinel values (`0` width, `unknown`, `Manual`); trimmed strings.
 8. **Per-row provenance:** source dataset id and source vintage on every row, not only per municipality.
 9. **Changelog and versioning** between vintages (method changes, reclassifications), plus a channel for errata and known issues.
+
+# Can-BICS OSM (2024, 2026): data notes
+
+| Issue | Detail | Handling |
+|---|---|---|
+| No municipality, only CSD | Rows carry `CSDUID`/`CSDNAME`; national coverage | Assigned to places via each place's CSD list in `config/places.yaml` (seeded by `scripts/seed_place_csds.py`); only CSDs of the 75 CCND places are kept |
+| Class names | Official CAN-BICS names (`Non-Conforming Trail/Major Road/Other`); CCND renamed these | `class_map` in `config/sources.yaml` → CCND slugs |
+| `PRUID` | Stored as boolean, all empty | Ignored |
+| `osm_id` | Float; not unique (ways split at CSD boundaries) | Cast to integer text; id = hash of osm_id + geometry |
+| No length field | — | Geodesic km computed |

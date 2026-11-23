@@ -18,7 +18,8 @@ def pipeline() -> dict:
 
 
 def sources() -> dict:
-    return load("sources")
+    """Source entries; keys starting with '.' are YAML anchors for shared settings, not sources."""
+    return {k: v for k, v in load("sources").items() if not k.startswith(".")}
 
 
 def source(source_id: str) -> dict:

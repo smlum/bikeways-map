@@ -13,10 +13,3 @@ classes:
 
 # Fallback for values not listed above.
 unknown: {slug: unknown, label: Unknown, comfort: unknown, color: "#888888"}
-
-# "Colour by source class" mode: per-city palette, assigned by km (largest first).
-# Classes beyond the palette fold into `other`; segments outside the active city use `outside`.
-source_palette:
-  colors: ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
-  other: "#8a8a8a"
-  outside: "#d0d0d0"

@@ -1,15 +1,29 @@
 # One entry per dataset + vintage. Key = source id, used for output names.
 # `columns` maps source column -> common column name. Unlisted columns are dropped.
 # Common names: class, source_class, source_class_secondary, surface_type, width_m,
-#               length_km_source, municipality, province, csdname, cmaname, source_record_id
+#               length_km_source, municipality, province, csdname, cmaname, source_record_id,
+#               name, osm_id, csd_uid
+# place_by:   municipality (data name -> place, via places.yaml names) | csd (csd_uid -> place, via places.yaml csds)
+# csd:        spatial (assign csd_uid from segment midpoint) | omitted if a column maps to csd_uid
+# short:      short name for labels (e.g. "Only in CCND")
+# keep_outside_places: (place_by csd) keep features outside every place, with no place, so the map
+#             shows them as context. Profiles and comparisons still use only each place's CSDs.
+# id_fields:  common columns hashed (with geometry) into a stable segment id
+# class_map:  source_class -> CAN-BICS class slug, when the source has no class column of its own
+# length_km_source defaults to the computed geodesic length when the source has none.
 
 ccnd_2024:
   dataset: ccnd
   vintage: 2024
   label: Canadian Cycling Network Database (2024)
+  short: CCND
   path: data/raw/ccnd/2024/canadian_cycling_network_database/cycle_network_2024.gpkg
   layer: canbics_2024
   municipality_field: municipality
+  place_by: municipality
+  csd: spatial
+  id_fields: [source_record_id]
+  attribution: Statistics Canada, Canadian Cycling Network Database; municipal open data
   columns:
     canbics_class: class
     source_class: source_class
@@ -34,3 +48,56 @@ ccnd_2024:
     source_class: source_class
     class: canbics_class
     example_url: street_view_url
+
+# Can-BICS national OSM network. Official CAN-BICS class names; CCND renamed the
+# non-conforming classes (trail -> gravel_trail, major road -> major_shared_roadway, other -> shared_roadway).
+.osm_common: &osm_common
+  dataset: canbics_osm
+  short: OSM
+  place_by: csd
+  keep_outside_places: true
+  id_fields: [osm_id]
+  int_columns: [osm_id]
+  attribution: © OpenStreetMap contributors; Can-BICS
+  columns:
+    CBICS_infr: source_class
+    osm_name: name
+    osm_id: osm_id
+    CSDNAME: csdname
+    CSDUID: csd_uid
+  class_map:
+    Cycle Track: cycle_track
+    Local Street Bikeway: local_street_bikeway
+    Bike Path: bike_path
+    Multi-Use Path: multi_use_path
+    Painted Bike Lane: painted_bike_lane
+    Non-Conforming Trail: gravel_trail
+    Non-Conforming Major Road: major_shared_roadway
+    Non-Conforming Other: shared_roadway
+
+osm_2024:
+  <<: *osm_common
+  vintage: 2024
+  label: Can-BICS OpenStreetMap (2024)
+  path: data/raw/canbics_osm/2024/extracted/OSM_CAN_BICS_v4r1.shp
+  # OSM extract date Can-BICS classified from: the popup's "OSM tags" button shows each way as of this date.
+  osm_snapshot: "2024-01-15"
+  provenance:
+    provider: OpenStreetMap contributors, classified by Can-BICS
+    year_updated: "2024"
+    source_url: https://www.arcgis.com/home/item.html?id=efaf04c6e3914c059bfb7298e784a89c
+    license: https://opendatacommons.org/licenses/odbl/
+    attribution: Data © OpenStreetMap contributors (ODbL). OSM source date 2024-01-15.
+
+# Disabled for now (uncomment to restore).
+# osm_2026:
+#   <<: *osm_common
+#   vintage: 2026
+#   label: Can-BICS OpenStreetMap (2026)
+#   path: data/raw/canbics_osm/2026/extracted/OSM_CAN_BICS_v2026.shp
+#   provenance:
+#     provider: OpenStreetMap contributors, classified by Can-BICS
+#     year_updated: "2026"
+#     source_url: https://www.arcgis.com/home/item.html?id=efaf04c6e3914c059bfb7298e784a89c
+#     license: https://opendatacommons.org/licenses/odbl/
+#     attribution: Data © OpenStreetMap contributors (ODbL). OSM source date 2026-01-12.

@@ -1,0 +1,36 @@
+# Known issues with the source data, shown in the map's Issues panel (right) for each place.
+# Usually one issue per place and class pair (e.g. CCND bike path that should be multi-use path),
+# with clicked segments as examples. Added from the map (Add issue in a segment popup, saved here by
+# scripts/serve.py), by hand, or from form responses: python scripts/import_issues.py <csv>
+#
+#   id:              set automatically
+#   place:           place id (config/places.yaml)
+#   dataset:         source id (config/sources.yaml); default ccnd_2024
+#   type:            wrong_class | missing | other
+#   class:           optional; the CAN-BICS class the data gives (config/classes.yaml slug)
+#   suggested_class: optional; what it should be: a class slug, or `exclude` (not cycling infrastructure)
+#   source_class:    optional; the city's own category, exactly as in the data
+#   note:            optional short description
+#   examples:        optional list of locations: lat, lng, heading (Street View), segment id,
+#                    class / other_class / status as shown when clicked
+#   date:            YYYY-MM-DD (set automatically)
+#   by, link:        optional
+#
+issues:
+- id: 0547721f
+  place: sherbrooke
+  dataset: ccnd_2024
+  type: wrong_class
+  class: cycle_track
+  source_class: piste cyclable bidirectionnelle
+  suggested_class: multi_use_path
+  examples:
+  - lat: 45.418904
+    lng: -71.903762
+    heading: 155
+    segment: ccnd_2024-af66be3f0eac
+    class: cycle_track
+    other_class: multi_use_path
+    status: differs
+    source_class: piste cyclable bidirectionnelle
+  date: '2026-11-23'

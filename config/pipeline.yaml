@@ -7,6 +7,13 @@ build_dir: data/build
 scope:
   places: []
 
+# Census subdivisions (2021 boundary file). Used to assign segments to CSDs and places.
+csd_boundaries:
+  path: data/raw/census_boundaries/lcsd000a21a_e/lcsd000a21a_e.shp
+  id: CSDUID
+  name: CSDNAME
+  area_km2: LANDAREA
+
 # All tilesets share one layer name so the web style works across datasets/vintages.
 tiles:
   layer: network

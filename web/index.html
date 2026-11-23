@@ -12,24 +12,21 @@
 <body>
   <div id="map"></div>
   <aside id="panel">
-    <h1 id="title"></h1>
-    <nav class="tabs"><a href="index.html" aria-current="page">Map</a><a href="table.html" id="compare-link">Compare cities</a></nav>
-    <label class="field">Dataset <select id="source"></select></label>
-    <label class="field">City
-      <input id="city-search" list="city-list" placeholder="Search a city…" autocomplete="off">
+    <div class="panel-top">
+      <div class="title-row"><h1 id="title"></h1>
+        <nav class="tabs" id="panel-tabs"><a href="?" data-panel="map" aria-current="page">Map</a><a href="?panel=table" data-panel="table">Table</a></nav></div>
+      <input id="city-search" list="city-list" placeholder="Search a city…" autocomplete="off" aria-label="City">
       <datalist id="city-list"></datalist>
-    </label>
-    <div class="seg-toggle" role="radiogroup" aria-label="Colour by">
-      <span>Colour by</span>
-      <button data-mode="class" aria-pressed="true">CAN-BICS class</button>
-      <button data-mode="source" aria-pressed="false">Source class</button>
+      <div class="seg-toggle" id="views" role="radiogroup" aria-label="Dataset"></div>
     </div>
-    <h2 id="legend-title">CAN-BICS class</h2>
-    <ul id="legend"></ul>
-    <p class="hint">Click a segment for details.</p>
+    <div id="info"></div>
+    <div id="table"></div>
   </aside>
-  <aside id="profile"></aside>
+  <aside id="issues"></aside>
+  <script src="common.js"></script>
   <script src="profile.js"></script>
+  <script src="table.js"></script>
+  <script src="issues.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
