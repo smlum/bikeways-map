@@ -34,3 +34,427 @@ issues:
     status: differs
     source_class: piste cyclable bidirectionnelle
   date: '2026-11-23'
+- id: 98822c96
+  place: calgary
+  dataset: ccnd_2024
+  type: missing
+  note: Missing multi-use paths
+  date: '2026-11-24'
+- id: 299dfc31
+  place: fredericton
+  dataset: ccnd_2024
+  type: missing
+  suggested_class: multi_use_path
+  examples:
+  - lat: 45.9827
+    lng: -66.67599
+    heading: 250
+    other_class: multi_use_path
+    status: only
+  date: '2026-11-24'
+- id: 7a10d90a
+  place: fredericton
+  dataset: ccnd_2024
+  type: missing
+  suggested_class: gravel_trail
+  examples:
+  - lat: 45.96702
+    lng: -66.699116
+    heading: 281
+    other_class: gravel_trail
+    status: only
+  date: '2026-11-24'
+- id: e23454de
+  place: montreal
+  dataset: ccnd_2024
+  type: wrong_class
+  class: shared_roadway
+  source_class: chaussée désignée
+  suggested_class: local_street_bikeway
+  note: ccnd has no local street bikeway coded
+  examples:
+  - lat: 45.56516
+    lng: -73.580789
+    heading: 294
+    segment: ccnd_2024-e53689fd7c9e
+    class: shared_roadway
+    other_class: local_street_bikeway
+    status: differs
+    source_class: chaussée désignée
+  date: '2026-11-24'
+- id: 407f30a5
+  place: montreal
+  dataset: ccnd_2024
+  type: wrong_class
+  class: bike_path
+  source_class: piste cyclable en site propre
+  suggested_class: shared_roadway
+  examples:
+  - lat: 45.521484
+    lng: -73.539922
+    heading: 105
+    segment: ccnd_2024-e95ffef9b54c
+    class: bike_path
+    other_class: shared_roadway
+    status: differs
+    source_class: piste cyclable en site propre
+  date: '2026-11-24'
+- id: 16e8fa96
+  place: calgary
+  dataset: ccnd_2024
+  type: wrong_class
+  class: shared_roadway
+  source_class: neighbourhood greenway
+  suggested_class: local_street_bikeway
+  note: Some cases
+  examples:
+  - lat: 51.071066
+    lng: -114.067461
+    heading: 180
+    segment: ccnd_2024-4b3d2aef1675
+    class: shared_roadway
+    other_class: local_street_bikeway
+    status: differs
+    source_class: neighbourhood greenway
+  date: '2026-11-24'
+- id: 2aa08a4b
+  place: burnaby
+  dataset: ccnd_2024
+  type: missing
+  suggested_class: multi_use_path
+  date: '2026-11-24'
+- id: e9442670
+  place: burnaby
+  dataset: ccnd_2024
+  type: wrong_class
+  class: shared_roadway
+  source_class: cycle road
+  suggested_class: painted_bike_lane
+  note: Some borderline painted bike lanes
+  examples:
+  - lat: 49.229421
+    lng: -122.973233
+    heading: 92
+    segment: ccnd_2024-ae523c9d2c3c
+    class: shared_roadway
+    other_class: painted_bike_lane
+    status: differs
+    source_class: cycle road
+  date: '2026-11-24'
+- id: 2a3c9634
+  place: edmonton
+  dataset: ccnd_2024
+  type: wrong_class
+  class: local_street_bikeway
+  source_class: shared roadway - lower traffic
+  suggested_class: major_shared_roadway
+  note: Over-classification of local street bikeway
+  examples:
+  - lat: 53.5559
+    lng: -113.575793
+    heading: 89
+    segment: ccnd_2024-d79e39366d75
+    class: local_street_bikeway
+    other_class: major_shared_roadway
+    status: differs
+    source_class: shared roadway - lower traffic
+  date: '2026-11-24'
+- id: d9cdf6a1
+  place: edmonton
+  dataset: osm_2024
+  type: wrong_class
+  class: multi_use_path
+  suggested_class: exclude
+  note: Many segments labelled mup seem to be regular sidewalks
+  examples:
+  - lat: 53.563743
+    lng: -113.537393
+    heading: 270
+    other_class: multi_use_path
+    status: only
+  date: '2026-11-24'
+- id: c23706c8
+  place: ottawa
+  dataset: osm_2024
+  type: missing
+  source_class: path
+  suggested_class: multi_use_path
+  examples:
+  - lat: 45.448411
+    lng: -75.688908
+    heading: 21
+    segment: ccnd_2024-63b6ad2704b7
+    class: multi_use_path
+    status: only
+    source_class: path
+  date: '2026-11-24'
+- id: 14715b54
+  place: ottawa
+  dataset: ccnd_2024
+  type: wrong_class
+  class: multi_use_path
+  source_class: path
+  suggested_class: gravel_trail
+  examples:
+  - lat: 45.418338
+    lng: -75.557439
+    heading: 258
+    segment: ccnd_2024-aa2f5267e790
+    class: multi_use_path
+    other_class: gravel_trail
+    status: differs
+    source_class: path
+  date: '2026-11-24'
+- id: '95458564'
+  place: brampton
+  dataset: osm_2024
+  type: wrong_class
+  class: multi_use_path
+  source_class: multi-use path
+  suggested_class: gravel_trail
+  examples:
+  - lat: 43.705842
+    lng: -79.714128
+    heading: 41
+    segment: ccnd_2024-8ac8d71aded6
+    class: multi_use_path
+    other_class: gravel_trail
+    status: differs
+    source_class: multi-use path
+  date: '2026-11-24'
+- id: d89b2ff5
+  place: brampton
+  dataset: ccnd_2024
+  type: wrong_class
+  class: painted_bike_lane
+  source_class: on street bike lane
+  suggested_class: exclude
+  examples:
+  - lat: 43.74021
+    lng: -79.757761
+    heading: 253
+    segment: ccnd_2024-d8d90cc82dba
+    class: painted_bike_lane
+    status: only
+    source_class: on street bike lane
+  date: '2026-11-24'
+- id: a5515919
+  place: brampton
+  dataset: ccnd_2024
+  type: wrong_class
+  class: multi_use_path
+  source_class: multi-use path
+  suggested_class: gravel_trail
+  examples:
+  - lat: 43.7468
+    lng: -79.803098
+    heading: 285
+    segment: ccnd_2024-f0077c3762c1
+    class: multi_use_path
+    status: only
+    source_class: multi-use path
+  date: '2026-11-24'
+- id: 2ba31682
+  place: brampton
+  dataset: osm_2024
+  type: missing
+  source_class: multi-use
+  suggested_class: multi_use_path
+  examples:
+  - lat: 43.711241
+    lng: -79.842292
+    heading: 315
+    segment: ccnd_2024-8b85ad8ef17d
+    class: multi_use_path
+    status: only
+    source_class: multi-use
+  date: '2026-11-24'
+- id: 209eff53
+  place: york_region
+  dataset: ccnd_2024
+  type: wrong_class
+  class: painted_bike_lane
+  source_class: protected bike lane
+  suggested_class: cycle_track
+  examples:
+  - lat: 43.806657
+    lng: -79.432412
+    heading: 74
+    segment: ccnd_2024-7b7813ce5e01
+    class: painted_bike_lane
+    other_class: cycle_track
+    status: differs
+    source_class: protected bike lane
+  date: '2026-11-24'
+- id: e2b0bb70
+  place: york_region
+  dataset: ccnd_2024
+  type: wrong_class
+  class: multi_use_path
+  source_class: off-road multi-use trail
+  suggested_class: gravel_trail
+  examples:
+  - lat: 43.798989
+    lng: -79.481046
+    heading: 283
+    segment: ccnd_2024-9f43b2dbec1e
+    class: multi_use_path
+    other_class: gravel_trail
+    status: differs
+    source_class: off-road multi-use trail
+  date: '2026-11-24'
+- id: 270e6fbf
+  place: quebec_city
+  dataset: ccnd_2024
+  type: wrong_class
+  class: bike_path
+  source_class: piste cyclable
+  suggested_class: multi_use_path
+  note: Source only has one class for cycle track, bike path and mup
+  examples:
+  - lat: 46.803584
+    lng: -71.206813
+    heading: 224
+    segment: ccnd_2024-fd1523bc4b26
+    class: bike_path
+    other_class: multi_use_path
+    status: differs
+    source_class: piste cyclable
+  date: '2026-11-24'
+- id: df65b5b2
+  place: quebec_city
+  dataset: ccnd_2024
+  type: wrong_class
+  class: bike_path
+  source_class: piste cyclable
+  suggested_class: cycle_track
+  examples:
+  - lat: 46.785705
+    lng: -71.237117
+    heading: 243
+    segment: ccnd_2024-878585a68e4e
+    class: bike_path
+    other_class: cycle_track
+    status: differs
+    source_class: piste cyclable
+  date: '2026-11-24'
+- id: b37270a5
+  place: quebec_city
+  dataset: osm_2024
+  type: wrong_class
+  class: gravel_trail
+  source_class: piste cyclable
+  suggested_class: bike_path
+  examples:
+  - lat: 46.786045
+    lng: -71.303355
+    heading: 239
+    segment: ccnd_2024-2c574cd07302
+    class: bike_path
+    other_class: gravel_trail
+    status: differs
+    source_class: piste cyclable
+  date: '2026-11-24'
+- id: c06bc1d5
+  place: levis
+  dataset: ccnd_2024
+  type: wrong_class
+  class: bike_path
+  source_class: '5'
+  suggested_class: multi_use_path
+  examples:
+  - lat: 46.745339
+    lng: -71.216119
+    heading: 330
+    segment: ccnd_2024-7c00c3dbc759
+    class: bike_path
+    other_class: multi_use_path
+    status: differs
+    source_class: '5'
+  date: '2026-11-24'
+- id: 6ba0b22f
+  place: levis
+  dataset: osm_2024
+  type: wrong_class
+  class: multi_use_path
+  source_class: '5'
+  suggested_class: bike_path
+  examples:
+  - lat: 46.698769
+    lng: -71.289708
+    heading: 128
+    segment: ccnd_2024-57af56081fb9
+    class: bike_path
+    other_class: multi_use_path
+    status: differs
+    source_class: '5'
+  date: '2026-11-24'
+- id: b1092e96
+  place: levis
+  dataset: osm_2024
+  type: wrong_class
+  class: painted_bike_lane
+  source_class: '1'
+  suggested_class: major_shared_roadway
+  examples:
+  - lat: 46.725986
+    lng: -71.267553
+    heading: 347
+    segment: ccnd_2024-6bee83e45c26
+    class: major_shared_roadway
+    other_class: painted_bike_lane
+    status: differs
+    source_class: '1'
+  date: '2026-11-24'
+- id: 6547ed92
+  place: west_vancouver
+  dataset: ccnd_2024
+  type: wrong_class
+  class: shared_roadway
+  source_class: shared roadway, on street route - wide curb lane
+  suggested_class: painted_bike_lane
+  examples:
+  - lat: 49.337252
+    lng: -123.191925
+    heading: 291
+    segment: ccnd_2024-8490d7511c41
+    class: shared_roadway
+    other_class: painted_bike_lane
+    status: differs
+    source_class: shared roadway, on street route - wide curb lane
+  date: '2026-11-24'
+- id: 55f5f99d
+  place: victoria
+  dataset: ccnd_2024
+  type: wrong_class
+  class: cycle_track
+  source_class: aaa protected / off-street facility
+  suggested_class: multi_use_path
+  note: Insufficient information from source to distinguish mup
+  examples:
+  - lat: 48.409391
+    lng: -123.372087
+    heading: 124
+    segment: ccnd_2024-ce3c256160cb
+    class: cycle_track
+    other_class: multi_use_path
+    status: differs
+    source_class: aaa protected / off-street facility
+  date: '2026-11-24'
+- id: eb3b50f2
+  place: regina
+  dataset: ccnd_2024
+  type: wrong_class
+  class: painted_bike_lane
+  source_class: on street bicycle route
+  suggested_class: major_shared_roadway
+  examples:
+  - lat: 50.46837
+    lng: -104.669724
+    heading: 29
+    segment: ccnd_2024-9c9858d80007
+    class: painted_bike_lane
+    other_class: major_shared_roadway
+    status: differs
+    source_class: on street bicycle route
+  date: '2026-11-24'

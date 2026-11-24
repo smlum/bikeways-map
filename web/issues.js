@@ -25,14 +25,35 @@ const IssuesPanel = (() => {
     const add = !draft && ctx.canAdd ? `<div class="issues-add"><button class="new-issue">Add issue</button>
       <span class="muted">or click a segment</span></div>
       ${ctx.canSave ? "" : `<p class="muted small">Read-only: saving needs the local server (scripts/serve.py).</p>`}` : "";
+    // One section per dataset (baseline first); issues without a dataset belong to the baseline.
+    const datasets = ctx.datasets || [];
+    const dsOf = (i) => i.dataset || ctx.defaultDataset;
+    const shortOf = (id) => datasets.find((d) => d.id === id)?.short ?? id;
     const form = draft ? draftForm() : "";
-    const list = issues.length ? `<ul class="issue-list">${issues.map(item).join("")}</ul>` : "";
+    const order = [...datasets.map((d) => d.id), ...new Set(issues.map(dsOf))].filter((v, n, a) => a.indexOf(v) === n);
+    const byDataset = (its, head) => order.map((ds) => {
+      const g = its.filter((i) => dsOf(i) === ds);
+      return g.length ? `${head(ds)}<ul class="issue-list">${g.map(item).join("")}</ul>` : "";
+    }).join("");
+    // One city: a section per dataset. All cities: a section per city (A–Z), its issues by dataset,
+    // with dataset sub-headings only where a city has issues on more than one dataset.
+    const list = !ctx.all
+      ? byDataset(issues, (ds) => `<h3 class="issue-ds">${esc(shortOf(ds))}</h3>`)
+      : [...new Set(issues.map((i) => i.place))]
+        .sort((a, b) => ctx.placeName(a).localeCompare(ctx.placeName(b)))
+        .map((pid) => {
+          const its = issues.filter((i) => i.place === pid);
+          const mixed = new Set(its.map(dsOf)).size > 1;
+          return `<section class="issue-group"><h3 class="issue-city">${esc(ctx.placeName(pid))}</h3>
+            ${byDataset(its, (ds) => mixed ? `<h4 class="issue-ds">${esc(shortOf(ds))}</h4>` : "")}</section>`;
+        }).join("");
     const report = ctx.reportUrl ? `<a class="small" href="${esc(ctx.reportUrl)}" target="_blank" rel="noopener">Report an issue ↗</a>` : "";
     el.innerHTML = `${head}<div class="issues-body">${add}${form}${list}${report}</div>`;
     wire();
 
+    // What the issue is about; the type is shown separately (e.g. Missing infrastructure + Multi-use path).
     function title(i) {
-      if (i.type === "missing" && !i.class) return `Missing: ${sw(i.suggested_class)}${esc(label(i.suggested_class) ?? "")}`;
+      if (i.type === "missing" && !i.class) return `${sw(i.suggested_class)}${esc(label(i.suggested_class) ?? "")}`;
       const from = i.class ? `${sw(i.class)}${esc(label(i.class))}` : (i.source_class ? showWs(i.source_class) : "Whole place");
       return i.suggested_class ? `${from} <span class="muted">→</span> ${sw(i.suggested_class)}${esc(label(i.suggested_class))}` : from;
     }
@@ -40,15 +61,19 @@ const IssuesPanel = (() => {
     function item(i) {
       const sel = ctx.selected === i.id;
       const ex = i.examples || [];
-      const pins = ex.map((e, n) => `<button class="pin" data-ex="${n}" title="Go to example ${n + 1}">${n + 1}</button>`).join("");
-      const meta = [ctx.all && ctx.placeName(i.place), i.source_class && i.class ? `source class: ${i.source_class}` : null, i.date]
-        .filter(Boolean).map(esc).join(" · ");
+      // Map-marker buttons, one per example location (numbered when there are several).
+      const marker = (n) => `<svg viewBox="0 0 14 18" aria-hidden="true"><path d="M7 17.5C7 17.5 1 10.6 1 6.6a6 6 0 0 1 12 0c0 4-6 10.9-6 10.9z"/>
+        ${ex.length > 1 ? `<text x="7" y="9.5">${n + 1}</text>` : `<circle cx="7" cy="6.6" r="2.2"/>`}</svg>`;
+      const pins = ex.map((e, n) => `<button class="pin" data-ex="${n}" title="Show example ${n + 1} on the map">${marker(n)}</button>`).join("");
+      // Card: type with example markers on the right; what it is;
+      // note; Delete when selected.
+      const del = sel && ctx.canSave && i.id ? `<button class="del" title="Delete issue">Delete</button>` : "";
       return `<li class="issue-item ${sel ? "selected" : ""}" data-id="${esc(i.id ?? "")}">
-        <div class="issue-line"><span class="issue-title">${title(i)}</span>
-          <span class="label label-${esc(i.type)}">${esc(types[i.type] ?? i.type)}</span></div>
+        <div class="issue-line"><span class="label label-${esc(i.type)}">${esc(types[i.type] ?? i.type)}</span>
+          ${pins ? `<span class="pins">${pins}</span>` : ""}</div>
+        <div class="issue-title">${title(i)}</div>
         ${i.note ? `<p>${esc(i.note)}</p>` : ""}
-        <div class="issue-foot">${pins ? `<span class="pins">${pins}</span>` : ""}<span class="muted">${meta}</span>
-          ${sel && ctx.canSave && i.id ? `<button class="del" title="Delete issue">Delete</button>` : ""}</div>
+        ${del ? `<div class="issue-foot">${del}</div>` : ""}
       </li>`;
     }
 
@@ -58,15 +83,17 @@ const IssuesPanel = (() => {
       const classOpts = (cur, extra = []) => [opt("", "—", cur), ...classes.map((c) => opt(c.slug, c.label, cur)),
         ...extra.map(([v, t]) => opt(v, t, cur))].join("");
       const ex = d.examples?.[0];
-      const match = issues.find((i) => i.id && i.type === d.type && (i.class ?? "") === (d.class ?? "")
+      const ds = d.dataset || ctx.defaultDataset;
+      const match = issues.find((i) => i.id && dsOf(i) === ds && i.type === d.type && (i.class ?? "") === (d.class ?? "")
         && (i.suggested_class ?? "") === (d.suggested_class ?? ""));
       const sv = ex && streetViewUrl(cfg, ex);
       return `<form class="issue-form">
         <div class="form-title">New issue${d.placeName ? ` · ${esc(d.placeName)}` : ""}</div>
         ${match ? `<div class="match">Same as an existing issue: <b>${title(match)}</b>
           ${ex ? `<button type="button" class="add-to" data-id="${esc(match.id)}">Add as example</button>` : ""}</div>` : ""}
+        <label>Dataset <select name="dataset">${datasets.map((x) => opt(x.id, x.short, ds)).join("")}</select></label>
         <label>Type <select name="type">${Object.entries(types).map(([k, t]) => opt(k, t, d.type)).join("")}</select></label>
-        <label>${esc(d.aLabel)} says <select name="class">${classOpts(d.class)}</select></label>
+        <label>${esc(shortOf(ds))} says <select name="class">${classOpts(d.class)}</select></label>
         <label>Should be <select name="suggested_class">${classOpts(d.suggested_class, [["exclude", "Not cycling infrastructure"]])}</select></label>
         <label>Source class <input name="source_class" value="${esc(d.source_class ?? "")}" placeholder="optional"></label>
         <label>Note <textarea name="note" rows="2" placeholder="optional">${esc(d.note ?? "")}</textarea></label>

@@ -82,10 +82,7 @@ class Network {
     this.popup = new maplibregl.Popup({ maxWidth: "320px", closeOnClick: false });
     this.popup.on("close", () => this.highlight(null)); // .on() returns a subscription in v5
 
-    const HIT_PX = 6; // query a box around the pointer so thin lines are easy to hit
-    this.featureAt = (pt) => map.getLayer(this.lineId) && map.queryRenderedFeatures(
-      [[pt.x - HIT_PX, pt.y - HIT_PX], [pt.x + HIT_PX, pt.y + HIT_PX]], { layers: [this.lineId] })
-      .find((f) => interactive(f.properties));
+    this.featureAt = (pt) => lineAt(map, pt, this.lineId, interactive);
 
     map.on("mousemove", (e) => (map.getCanvas().style.cursor = this.featureAt(e.point) ? "pointer" : ""));
     map.on("click", (e) => {
@@ -224,16 +221,27 @@ async function showOsmTags(box) {
  */
 // filtering(): while true (table view) the box is a free-text filter: typing calls onFilter(text),
 // and focus/blur leave the text alone.
+// Accents are ignored when searching: "quebe" finds Québec City. The native suggestion list matches
+// accents exactly, so while typing, a name that only matches without accents is offered unaccented
+// ("Quebec City"); picking it still selects the place and shows its real name.
 function citySearch(input, datalist, { getPlaces, getCurrent, onPick, filtering = () => false, onFilter }) {
+  let names = [];
   const byName = () => Object.fromEntries(
-    Object.entries(getPlaces() || {}).map(([id, p]) => [p.name.toLowerCase(), id]));
+    Object.entries(getPlaces() || {}).map(([id, p]) => [fold(p.name), id]));
+  const fillOptions = (q = "") => {
+    q = q.trim().toLowerCase();
+    datalist.innerHTML = names.map((n) => {
+      const v = !q || n.toLowerCase().includes(q) || !fold(n).includes(fold(q)) ? n : unaccent(n);
+      return `<option value="${esc(v)}"></option>`;
+    }).join("");
+  };
   input.onchange = () => {
-    const id = byName()[input.value.trim().toLowerCase()];
+    const id = byName()[fold(input.value.trim())];
     if (!id) return;
     onPick(id);
     input.blur();
   };
-  input.oninput = () => filtering() && onFilter?.(input.value);
+  input.oninput = () => filtering() ? onFilter?.(input.value) : fillOptions(input.value);
   input.onfocus = () => {
     if (filtering()) return;
     input.placeholder = input.value || "Search a city…";
@@ -247,9 +255,9 @@ function citySearch(input, datalist, { getPlaces, getCurrent, onPick, filtering 
   };
   return {
     setOptions(places) {
-      const names = realPlaces(places).map(([, p]) => p.name).sort((a, b) => a.localeCompare(b));
+      names = realPlaces(places).map(([, p]) => p.name).sort((a, b) => a.localeCompare(b));
       if (places?.[ALL]) names.unshift(places[ALL].name);
-      datalist.innerHTML = names.map((n) => `<option value="${esc(n)}"></option>`).join("");
+      fillOptions();
     },
     show(name) { if (document.activeElement !== input && !filtering()) input.value = name; },
     // Switch between picking a city and filtering the table.
@@ -301,6 +309,26 @@ function esc(v) {
 function canbicsKm(place, classes) {
   return classes.filter((c) => c.comfort !== "non_conforming")
     .reduce((t, c) => t + (place.by_class_km[c.slug] || 0), 0);
+}
+
+// The first line of `layer` near a screen point (passing `keep(props)`, if given). Queries a box around
+// the pointer so thin lines are easy to hover and click; use it for every clickable line layer.
+const HIT_PX = 6;
+function lineAt(map, pt, layer, keep = () => true) {
+  if (!map.getLayer(layer)) return undefined;
+  return map.queryRenderedFeatures([[pt.x - HIT_PX, pt.y - HIT_PX], [pt.x + HIT_PX, pt.y + HIT_PX]], { layers: [layer] })
+    .find((f) => keep(f.properties));
+}
+
+// Text without accents ("Québec" -> "Quebec"); fold() also lowercases, for accent-blind matching.
+const unaccent = (s) => String(s ?? "").normalize("NFD").replace(/\p{M}/gu, "");
+const fold = (s) => unaccent(s).toLowerCase();
+
+// Divider above the non-conforming classes: a checkbox that shows/hides them, with their total km.
+// The caller wires the change event on `.nc-divider input`.
+function ncDivider(on, kmHtml, title = "") {
+  return `<li class="divider nc-divider"><label title="${esc(title)}"><input type="checkbox" ${on ? "checked" : ""}>
+    Non-conforming</label><span class="num">${kmHtml}</span></li>`;
 }
 
 function fmtKm(km) {

@@ -6,7 +6,8 @@
 
 const Profile = (() => {
   function render(el, { data, classes, focus, onFocus, issues = [],
-    scAvailable = false, showSc = false, onToggleSc, fillList, totalB = null }) {
+    scAvailable = false, showSc = false, onToggleSc, fillList, totalB = null, showNC = true, onToggleNC,
+    classification }) {
     showSc = showSc && scAvailable && !fillList;
     if (!data) {
       el.innerHTML = `<p class="empty-state">Search for a city above.</p>`;
@@ -28,9 +29,14 @@ const Profile = (() => {
     const seen = new Set();
     Object.values(scBy).flat().forEach(({ sc }) => (seen.has(sc) ? splitSc.add(sc) : seen.add(sc)));
 
-    // Non-conforming classes are listed after a divider; they don't count towards the headline km.
+    // Non-conforming classes are listed after a divider (a show/hide checkbox with their total);
+    // they don't count towards the headline km.
+    const isNC = (c) => c.comfort === "non_conforming";
+    const ncKm = classes.classes.filter(isNC).reduce((t, c) => t + (data.by_class_km[c.slug] || 0), 0);
     let divided = false;
     const rows = classes.classes.map((c) => {
+      const divider = isNC(c) && !divided && (divided = true) ? ncDivider(showNC, fmtKm(ncKm)) : "";
+      if (isNC(c) && !showNC) return divider;
       const km = data.by_class_km[c.slug] || 0;
       const subs = scBy[c.slug] || [];
       const active = focus?.cls === c.slug;
@@ -40,8 +46,6 @@ const Profile = (() => {
             title="${splitSc.has(s.sc) ? "Split across several classes; highlights all of it" : "Highlight on the map"}">
             <span class="name">${showWs(s.sc)}${splitSc.has(s.sc) ? ` <span class="muted">*</span>` : ""}${flagged.has(s.sc) ? ` ${dot}` : ""}</span>
             <span class="num">${fmtKm(s.km)}</span></button></li>`).join("")}</ul>` : "";
-      const divider = c.comfort === "non_conforming" && !divided && (divided = true)
-        ? `<li class="divider">Non-conforming</li>` : "";
       return `${divider}<li><button class="row ${active ? "active" : ""} ${km ? "" : "empty-row"}" ${km ? `data-cls="${c.slug}"` : "disabled"}
           title="${km ? `${esc(c.comfort.replace("_", "-"))}. Click to highlight` : "None in this city"}">
           <span class="swatch" style="background:${c.color}"></span>
@@ -53,8 +57,10 @@ const Profile = (() => {
       Source classes</label>` : "";
 
     const link = (url, text) => url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${text}</a>` : "";
-    const meta = [`${fmtKm(data.total_km)} km incl. non-conforming`, prov.provider, prov.year_updated && `data ${prov.year_updated}`].filter(Boolean).map(esc)
-      .concat([link(prov.source_url, "source"), link(prov.license, "licence")].filter(Boolean));
+    // e.g. "City of Calgary (2023) · Source URL · Licence"
+    const who = [prov.provider, prov.year_updated && `(${prov.year_updated})`].filter(Boolean).join(" ");
+    const meta = [who].filter(Boolean).map(esc)
+      .concat([link(prov.source_url, "Source URL"), link(prov.license, "Licence")].filter(Boolean));
 
     el.innerHTML = `
       <header>
@@ -64,7 +70,10 @@ const Profile = (() => {
         <ul class="rows">${fillList ? "" : rows}</ul>
         ${toggle ? `<div class="list-foot">${toggle}${showSc && splitSc.size ? `<span class="muted small">* split across classes</span>` : ""}</div>` : ""}
       </section>
-      ${meta.length ? `<footer class="meta muted" title="${esc(prov.attribution ?? "")}">${meta.join(" · ")}</footer>` : ""}`;
+      ${meta.length || classification ? `<footer class="meta muted">
+        ${meta.length ? `<div title="${esc(prov.attribution ?? "")}">${meta.join(" · ")}</div>` : ""}
+        ${classification ? `<div>${esc(classification.text)} · ${link(classification.url, esc(classification.link_text ?? "Guide"))}</div>` : ""}
+      </footer>` : ""}`;
 
     if (fillList) fillList(el.querySelector(".rows"));
     el.querySelectorAll("button[data-cls]").forEach((b) => (b.onclick = () =>
@@ -72,6 +81,7 @@ const Profile = (() => {
     el.querySelectorAll("button[data-sc]").forEach((b) => (b.onclick = () =>
       onFocus(focus?.sc === b.dataset.sc ? null : { sc: b.dataset.sc })));
     el.querySelector(".sc-toggle input")?.addEventListener("change", (e) => onToggleSc(e.target.checked));
+    if (!fillList) el.querySelector(".nc-divider input")?.addEventListener("change", (e) => onToggleNC?.(e.target.checked));
   }
 
   return { render };

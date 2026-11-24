@@ -41,14 +41,14 @@ const CityTable = (() => {
     }
     if (!cols.some((c) => c.key === sort.key)) sort = { key: "canbics", dir: -1 };
 
-    const q = (ctx.q || "").trim().toLowerCase();
+    const q = fold((ctx.q || "").trim());
     const rows = realPlaces(summary.places).map(([id, p]) => ({
       id, name: p.name, province: (p.province || "").toUpperCase(), byClass: p.by_class_km, p,
       canbics: canbicsKm(p, classes),
       canbicsB: ctx.summaryB?.places[id] ? canbicsKm(ctx.summaryB.places[id], classes) : 0,
       cmp: mode === "compare" ? ctx.cmpKm(id).status : null,
     }))
-      .filter((r) => !q || r.name.toLowerCase().includes(q) || r.province.toLowerCase() === q)
+      .filter((r) => !q || fold(r.name).includes(q) || fold(r.province) === q)
       .sort((x, y) => {
         const c = cols.find((k) => k.key === sort.key);
         const vx = c.value(x), vy = c.value(y);

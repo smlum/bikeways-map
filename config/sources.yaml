@@ -83,7 +83,7 @@ osm_2024:
   # OSM extract date Can-BICS classified from: the popup's "OSM tags" button shows each way as of this date.
   osm_snapshot: "2024-01-15"
   provenance:
-    provider: OpenStreetMap contributors, classified by Can-BICS
+    provider: OSM, CHATR Lab
     year_updated: "2024"
     source_url: https://www.arcgis.com/home/item.html?id=efaf04c6e3914c059bfb7298e784a89c
     license: https://opendatacommons.org/licenses/odbl/
@@ -96,7 +96,7 @@ osm_2024:
 #   label: Can-BICS OpenStreetMap (2026)
 #   path: data/raw/canbics_osm/2026/extracted/OSM_CAN_BICS_v2026.shp
 #   provenance:
-#     provider: OpenStreetMap contributors, classified by Can-BICS
+#     provider: OSM, CHATR Lab
 #     year_updated: "2026"
 #     source_url: https://www.arcgis.com/home/item.html?id=efaf04c6e3914c059bfb7298e784a89c
 #     license: https://opendatacommons.org/licenses/odbl/

@@ -19,9 +19,11 @@ def export_areas(path, simplify_m: float = 25) -> None:
     rows = [{"place": pid, "csd_uid": u, "name": b.at[u, "csd_name"], "geometry": b.at[u, "geometry"]}
             for pid, uids in places.csds().items() for u in uids if u in b.index]
     g = gpd.GeoDataFrame(rows, crs=b.crs)
+    # Dissolve before simplifying: simplified neighbours no longer share edges, leaving sliver holes.
+    area = g.dissolve("place").reset_index()[["place", "geometry"]]
+    area["geometry"] = area.geometry.simplify(simplify_m)
     g["geometry"] = g.geometry.simplify(simplify_m)
     g["kind"] = "csd"
-    area = g.dissolve("place").reset_index()[["place", "geometry"]]
     area["kind"] = "area"
     area["name"] = area["place"].map(lambda p: reg[p]["name"])
     out = gpd.GeoDataFrame(pd.concat([g, area], ignore_index=True), crs=b.crs).to_crs(4326)
@@ -29,7 +31,21 @@ def export_areas(path, simplify_m: float = 25) -> None:
     out[["place", "kind", "name", "csd_uid", "geometry"]].to_file(path, driver="GeoJSON", engine="pyogrio")
 
 
-ISSUE_TYPES = {"wrong_class", "missing", "other"}
+def export_canada(path, simplify_m: float = 500, min_km2: float = 20) -> None:
+    """Outline of Canada (dissolved CSDs, incl. coastal water to the international line), for hiding
+    basemap labels elsewhere. Simplified to ~simplify_m, islets under min_km2 dropped (~36 KB).
+    Built once: delete the file to rebuild."""
+    if path.exists():
+        return
+    import shapely
+    b = csd.boundaries()
+    u = shapely.union_all(b.geometry.simplify(200).buffer(0).values).simplify(simplify_m)
+    g = shapely.MultiPolygon([shapely.Polygon(p.exterior) for p in getattr(u, "geoms", [u]) if p.area > min_km2 * 1e6])
+    out = gpd.GeoSeries([g], crs=b.crs).to_crs(4326).make_valid()
+    out.to_file(path, driver="GeoJSON", engine="pyogrio", layer_options={"COORDINATE_PRECISION": 4})
+
+
+ISSUE_TYPES ={"wrong_class", "missing", "other"}
 
 
 def load_issues(sources: list[str]) -> list[dict]:
@@ -90,6 +106,7 @@ def run() -> None:
         })
 
     export_areas(WEB_DATA / "areas.geojson")
+    export_canada(WEB_DATA / "canada.geojson")
 
     from pipeline.compare import pair_id
     comparisons = []

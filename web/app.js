@@ -9,9 +9,10 @@ async function main() {
   const cfg = await loadConfig();
   const classes = cfg.classes.classes;
   // mode: "class" | "compare"; focus = {cls} or {sc} (see focusExpr); showSc: list source classes
-  // cmpFocus (compare mode): see cmpFocusExpr. includeNC: show non-conforming-only stretches.
+  // cmpFocus (compare mode): see cmpFocusExpr. includeNC (compare): show non-conforming-only stretches.
+  // showNC (class tabs): draw the non-conforming classes.
   const state = { source: null, summary: null, city: null, focus: null, mode: "class",
-    cmpSummary: null, summaryB: null, cmpFocus: null, includeNC: false, view: null, showSc: false,
+    cmpSummary: null, summaryB: null, cmpFocus: null, includeNC: false, showNC: true, view: null, showSc: false,
     table: getParam("panel") === "table", q: "",
     // Issues: list (from the local issues API when serve.py runs, else config.json), draft = the
     // new-issue form, issueSel = selected issue id.
@@ -24,15 +25,14 @@ async function main() {
   const hadViewInUrl = !!location.hash; // read before MapLibre writes its own hash
   const map = new maplibregl.Map({
     container: "map", style: cfg.basemap, hash: true,
-    center: cfg.initial_view.center, zoom: cfg.initial_view.zoom,
+    center: cfg.initial_view.center, zoom: cfg.initial_view.zoom, maxBounds: cfg.max_bounds, minZoom: cfg.min_zoom,
   });
   map.addControl(new maplibregl.NavigationControl(), "bottom-right");
   window.map = map; // for debugging in devtools
-
   // Only the selected city's segments are clickable; elsewhere a click picks the city (see below).
   // In compare mode the popup reads "<a> says … / <b> says …" (see cmpTitle, matchRows).
   const net = new Network(map, cfg, {
-    interactive: (p) => state.city === ALL || p.place === state.city,
+    interactive: (p) => (state.city === ALL || p.place === state.city) && !ncHidden(p),
     popupTitle: (p) => state.mode === "compare" ? cmpTitle(p) : undefined,
     popupLead: (p) => state.mode === "compare" ? matchRows(p) : "",
     popupAction: (p, vars) => issueButton(p, vars, state.mode === "compare" ? "cmp" : state.source?.id === ck?.b ? "b" : "a"),
@@ -98,8 +98,9 @@ async function main() {
     const a = (compare ? state.cmpFocus : state.focus) ? DIM : cfg.other_city_opacity;
     // Compare: coloured by match status; class rows in the key only filter.
     const color = compare ? (k) => statusColors(k) : (k) => classColorExpr(cfg, k);
+    const hidden = compare ? cmpHiddenExpr() : state.showNC ? false : ncExpr("class");
     net.setPaint(["case", strong, color((c) => c), color((c) => fade(c, a))],
-      compare ? ["case", cmpHiddenExpr(), 0, 1] : 1, ["case", strong, 1, 0]);
+      ["case", hidden, 0, 1], ["case", strong, 1, 0]);
     other.show(compare);
   }
 
@@ -109,7 +110,7 @@ async function main() {
   const areaTip = new maplibregl.Popup({ closeButton: false, closeOnClick: false, className: "area-tip", offset: 14 });
   let hovered = null;
   const onLine = (pt) => net.featureAt(pt)
-    || (map.getLayer("cmp-b-only") && map.queryRenderedFeatures(pt, { layers: ["cmp-b-only"] }).length);
+    || lineAt(map, pt, "cmp-b-only");
   const otherPlaceAt = (pt) => {
     const id = areas && !onLine(pt) && areas.placeAt(pt);
     return id && id !== state.city && state.summary?.places[id] ? id : null;
@@ -155,6 +156,8 @@ async function main() {
   // Hidden unless includeNC: non-conforming stretches that are missing from the other dataset or
   // non-conforming there too. Conforming vs non-conforming differences always show.
   const cmpHidden = (status, cls, other) => !state.includeNC && isNC(cls) && (status === "only" || isNC(other));
+  // A network feature that's drawn invisible (so it shouldn't take clicks either).
+  const ncHidden = (p) => state.mode === "compare" ? cmpHidden(p.status, p.class, p.other_class) : !state.showNC && isNC(p.class);
 
   // The same, as map expressions over a comparison feature (status, class, other_class).
   const ncExpr = (prop) => ["in", ["coalesce", ["get", prop], ""],
@@ -222,10 +225,13 @@ async function main() {
         map.addLayer({ id: "cmp-b-only", type: "line", source: "cmp", "source-layer": "b",
           layout: { visibility: "none", "line-cap": "round", "line-join": "round" },
           paint: { "line-color": ck.colors.only_b, "line-width": lineWidth } }, top);
-        map.on("mouseenter", "cmp-b-only", () => (map.getCanvas().style.cursor = "pointer"));
-        map.on("click", "cmp-b-only", (e) => {
+        // Same hit area as the network's lines (lineAt), so all lines are equally easy to hover / click.
+        map.on("mousemove", (e) => { if (lineAt(map, e.point, "cmp-b-only")) map.getCanvas().style.cursor = "pointer"; });
+        map.on("click", (e) => {
           if (net.featureAt(e.point)) return; // the baseline line under the pointer gets the popup
-          const f = e.features[0], p = f.properties;
+          const f = lineAt(map, e.point, "cmp-b-only");
+          if (!f) return;
+          const p = f.properties;
           const tol = state.cmpSummary?.tolerance_m ?? 20;
           this.popup.setLngLat(e.lngLat).setHTML(segmentPopup(map, cfg, f, e, {
             // b's source_class is just its class name under another spelling (e.g. Can-BICS labels).
@@ -286,9 +292,16 @@ async function main() {
     const kmB = state.summaryB?.places[state.city]?.by_class_km || {};
     const pairKm = (a, b) => `${fmtKm(a)} <span class="b-km">/ ${fmtKm(b)}</span>`;
 
+    // Non-conforming: a checkbox divider (with both datasets' totals) that includes / hides them.
+    const ncSum = (km) => classes.filter((c) => isNC(c.slug)).reduce((t, c) => t + (km[c.slug] || 0), 0);
+    const ncNames = classes.filter((c) => isNC(c.slug)).map((c) => c.label.toLowerCase()).join(", ");
     let divided = false;
     classes.forEach((c) => {
-      if (isNC(c.slug) && !divided && (divided = true)) ul.insertAdjacentHTML("beforeend", `<li class="divider">Non-conforming</li>`);
+      if (isNC(c.slug) && !divided && (divided = true)) {
+        ul.insertAdjacentHTML("beforeend", ncDivider(state.includeNC, pairKm(ncSum(kmA), ncSum(kmB)),
+          `Include stretches where both datasets say ${ncNames}, or only one has it`));
+      }
+      if (isNC(c.slug) && !state.includeNC) return;
       const k = byClass[c.slug] || { total: 0, pairs: [] };
       const open = f && !f.side && f.cls === c.slug;
       const sub = open ? [
@@ -306,7 +319,7 @@ async function main() {
 
     // Status summary: whole-city totals, all clickable; differs / missing open a per-class breakdown.
     ul.insertAdjacentHTML("beforeend", `<li class="divider">Compared with ${esc(B())}</li>`);
-    const byCls = (side, st, km) => classes.filter((c) => km(c.slug)).map((c) =>
+    const byCls = (side, st, km) => classes.filter((c) => km(c.slug)).sort((x, y) => km(y.slug) - km(x.slug)).map((c) =>
       subRow({ side, status: st, cls: c.slug }, `<span class="name">${sw(side === "b" ? ck.colors.only_b : ck.colors.only_a)}${esc(c.label)}</span>`, km(c.slug))).join("");
     const openIf = (fo) => f && f.side === fo.side && f.status === fo.status;
     ul.append(row({ side: "a", status: "agree" }, `${sw(ck.colors.agree)}<span class="name">Match</span>`, status.agree));
@@ -331,12 +344,9 @@ async function main() {
       title: `In ${A()}, not in ${B()}`,
       sub: openIf({ side: "a", status: "only" }) ? byCls("a", "only", (s) => byClass[s]?.only) : "" }));
 
-    const ncNames = classes.filter((c) => isNC(c.slug)).map((c) => c.label.toLowerCase()).join(", ");
-    ul.insertAdjacentHTML("afterend", `<label class="nc-toggle" title="${esc(ncNames)}">
-        <input type="checkbox" ${state.includeNC ? "checked" : ""}> Include non-conforming</label>
-      <p class="muted small" title="Matched within ${state.cmpSummary?.tolerance_m ?? 20} m. A side of the street in only one dataset shows as missing in the other.">
+    ul.insertAdjacentHTML("afterend", `<p class="muted small" title="Matched within ${state.cmpSummary?.tolerance_m ?? 20} m. A side of the street in only one dataset shows as missing in the other.">
       km: ${esc(A())} <span class="b-km">/ ${esc(B())}</span></p>`);
-    ul.parentElement.querySelector(".nc-toggle input").onchange = (e) => {
+    ul.querySelector(".nc-divider input").onchange = (e) => {
       state.includeNC = e.target.checked;
       state.cmpFocus = null;
       refresh();
@@ -367,12 +377,18 @@ async function main() {
     if (b) startIssue(JSON.parse(b.dataset.ctx));
   });
 
+  // Which dataset an issue is about: the baseline (CCND) unless picked otherwise in the form.
+  // Issues are listed in this order, baseline first.
+  const defaultDataset = () => ck?.a ?? cfg.sources[0]?.id;
+  const issueDatasets = () => [...cfg.sources].sort((x, y) => (y.id === defaultDataset()) - (x.id === defaultDataset()))
+    .map((s) => ({ id: s.id, short: s.short ?? s.id }));
+
   // Prefill from what was clicked: class differs -> misclassified, a -> b's class; missing in a
   // (b's stretch) -> missing infrastructure, should be b's class; otherwise misclassified, a's class.
   function startIssue(c) {
     const b = c.kind === "b";
     const draft = {
-      place: c.place, placeName: state.summary?.places[c.place]?.name, aLabel: A(),
+      place: c.place, placeName: state.summary?.places[c.place]?.name, dataset: defaultDataset(),
       type: b ? "missing" : "wrong_class",
       class: b ? "" : c.class,
       suggested_class: b ? c.class : c.status === "differs" ? c.other : "",
@@ -390,7 +406,7 @@ async function main() {
   function newIssue() {
     const f = state.cmpFocus, cls = state.focus?.cls ?? f?.cls;
     const missing = f?.side === "b";
-    state.draft = { place: state.city, placeName: state.summary?.places[state.city]?.name, aLabel: A(),
+    state.draft = { place: state.city, placeName: state.summary?.places[state.city]?.name, dataset: defaultDataset(),
       type: missing ? "missing" : "wrong_class", class: missing ? "" : cls ?? "",
       suggested_class: missing ? f.cls : f?.other ?? "", source_class: state.focus?.sc ?? "", note: "", examples: [] };
     Object.assign(state, { issueError: null, issuesOpen: true, issueSel: null });
@@ -429,6 +445,7 @@ async function main() {
     refresh();
   }
 
+  let exampleToken = null;
   const issueHandlers = {
     toggle: () => {
       state.issuesOpen = !state.issuesOpen;
@@ -437,20 +454,29 @@ async function main() {
     },
     newIssue,
     select: selectIssue,
+    // Fly to the example, then open the popup of whatever is drawn there in the current tab, as if
+    // clicked (once the map has settled, so the lines are rendered and can be found).
     selectExample: (issue, n) => {
       const ex = issue.examples[n];
       if (state.issueSel !== issue.id) selectIssue(issue);
+      const token = (exampleToken = {});
+      map.once("idle", () => {
+        if (token !== exampleToken) return; // another marker was clicked meanwhile
+        const lngLat = new maplibregl.LngLat(ex.lng, ex.lat);
+        map.fire("click", { lngLat, point: map.project(lngLat), originalEvent: null });
+      });
       map.flyTo({ center: [ex.lng, ex.lat], zoom: Math.max(map.getZoom(), 16) });
+      map.triggerRepaint(); // so "idle" fires even if the view is already there
     },
     draftChange: (vals) => {
       const d = state.draft;
-      const relevant = ["type", "class", "suggested_class"].some((k) => (vals[k] ?? "") !== (d[k] ?? ""));
+      const relevant = ["dataset", "type", "class", "suggested_class"].some((k) => (vals[k] ?? "") !== (d[k] ?? ""));
       Object.assign(d, vals);
       if (relevant) refresh(); // the "same as an existing issue" hint depends on these
     },
     save: async (vals) => {
       const d = { ...state.draft, ...vals };
-      const issue = { place: d.place, dataset: ck?.a ?? state.source.id, type: d.type, class: d.class,
+      const issue = { place: d.place, dataset: d.dataset || defaultDataset(), type: d.type, class: d.class,
         suggested_class: d.suggested_class, source_class: d.source_class.trim(), note: d.note.trim(), examples: d.examples };
       if (await issueApi({ op: "add", issue })) {
         state.draft = null;
@@ -485,7 +511,7 @@ async function main() {
         const issue = state.issues.find((i) => i.id === id);
         if (issue) { state.issuesOpen = true; selectIssue(issue); }
       });
-      map.on("mouseenter", "issue-pins", () => (map.getCanvas().style.cursor = "pointer"));
+      map.on("mousemove", "issue-pins", () => (map.getCanvas().style.cursor = "pointer"));
     }
     const anySel = !!state.issueSel;
     const feats = cityIssues().flatMap((i) => (i.examples || []).map((ex) => ({ type: "Feature",
@@ -503,6 +529,7 @@ async function main() {
       cfg, title: name, issues: cityIssues(), draft: state.draft, selected: state.issueSel,
       canSave: state.api, canAdd: !!state.city && state.city !== ALL, error: state.issueError, open: state.issuesOpen, reportUrl: reportUrl(),
       all: state.city === ALL, placeName: (id) => state.summary?.places[id]?.name ?? id, on: issueHandlers,
+      datasets: issueDatasets(), defaultDataset: defaultDataset(),
     });
     if (map.isStyleLoaded() || map.getSource("network")) issuePins();
   }
@@ -515,6 +542,13 @@ async function main() {
       onFocus: setFocus, issues: cityIssues(),
       scAvailable: !!state.view?.source_classes && state.city !== ALL, showSc: state.showSc,
       onToggleSc: (on) => { state.showSc = on; refresh(); },
+      showNC: state.showNC, classification: cfg.classification,
+      onToggleNC: (on) => {
+        state.showNC = on;
+        // A highlighted row may have just been hidden.
+        if (!on && (isNC(state.focus?.cls) || state.focus?.sc !== undefined)) state.focus = null;
+        refresh();
+      },
       fillList: state.mode === "compare" ? fillCompare : null,
       totalB: state.mode === "compare" && state.summaryB?.places[state.city]
         ? canbicsKm(state.summaryB.places[state.city], classes) : null,
@@ -594,7 +628,18 @@ async function main() {
     x.setAttribute("aria-pressed", x.dataset.view === initialView.id));
   const cmpSummary = cmpPair && fetch(`data/${cmpPair.summary}`).then((r) => r.json()).then(withAll);
   const summaryB = ck && loadSummary(cfg.sources.find((s) => s.id === ck.b));
+  // Basemap labels (place, road, water names…) only inside Canada (data/canada.geojson, exported).
+  const canada = fetch("data/canada.geojson").then((r) => r.ok ? r.json() : null).catch(() => null);
+  async function canadaLabelsOnly(labelLayers) {
+    const shape = await canada;
+    if (!shape) return;
+    const within = ["within", shape.features?.[0]?.geometry ?? shape];
+    for (const l of labelLayers) map.setFilter(l.id, l.filter ? ["all", l.filter, within] : within);
+  }
+
   map.on("load", async () => {
+    // At load the style holds only the basemap's layers; ours are added later.
+    canadaLabelsOnly(map.getStyle().layers.filter((l) => l.type === "symbol"));
     state.cmpSummary = await cmpSummary;
     state.summaryB = await summaryB;
     // Live issues from the local dev server, if it's running (else the exported ones).

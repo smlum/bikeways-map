@@ -54,16 +54,19 @@ input[type="search"], #city-search { font: inherit; padding: 5px 8px; border: 1p
 .b-km { color: #a1a1a6; font-weight: normal; }
 #info header .total .b-km { font-size: 15px; }
 .rows .divider { font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 4px; padding-top: 4px; }
+.rows .nc-divider { display: flex; justify-content: space-between; align-items: center; font-size: inherit; color: var(--fg); line-height: 1.35; }
+.nc-divider .num { font-size: 12px; }
+.nc-divider label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.nc-divider input { margin: 0; }
 .area-tip .maplibregl-popup-content { padding: 2px 6px; font-size: 11px; color: var(--muted); pointer-events: none; box-shadow: 0 1px 3px rgb(0 0 0 / .12); }
 .area-tip .maplibregl-popup-tip { display: none; }
 .area-tip { pointer-events: none; }
 .sc-rows { margin: 0 0 4px 26px; font-size: 12px; }
 .sc-rows .row { padding: 1px 0; }
 .sc-rows .name .swatch { display: inline-block; width: 10px; height: 3px; vertical-align: middle; margin-right: 3px; }
-.list-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 6px; }
-.sc-toggle, .nc-toggle { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); cursor: pointer; }
-.sc-toggle input, .nc-toggle input { margin: 0; }
-.nc-toggle { margin-top: 8px; }
+.list-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--border); }
+.sc-toggle { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); cursor: pointer; }
+.sc-toggle input { margin: 0; }
 .small { font-size: 11px; }
 p.small { margin: 6px 0 0; line-height: 1.4; }
 .swatch { width: 18px; height: 4px; border-radius: 2px; flex: none; }
@@ -177,18 +180,27 @@ body.table-open #issues { display: none; }
 .issues-body { overflow: auto; padding: 0 14px 12px; border-top: 1px solid var(--border); }
 .issues-body > .small { display: block; margin-top: 10px; }
 .issue-list { list-style: none; margin: 0; padding: 0; }
+.issue-ds { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; margin: 10px 0 0; }
+.issue-group + .issue-group { border-top: 1px solid var(--border); }
+.issue-city { font-size: 13px; font-weight: 600; margin: 12px 0 0; }
+.issue-group .issue-ds { margin-top: 6px; }
 .issue-item { padding: 8px 0; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 12px; }
 .issue-item:last-child { border-bottom: none; }
 .issue-item.selected { background: var(--hover); margin: 0 -14px; padding: 8px 14px; }
 .issue-line { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
-.issue-title { font-size: 13px; font-weight: 500; }
+.issue-title { font-size: 13px; font-weight: 500; margin-top: 4px; }
 .issue-title .swatch { display: inline-block; width: 12px; height: 3px; vertical-align: middle; margin-right: 4px; }
 .issue-item p { margin: 3px 0 0; }
 .issue-foot { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 11px; }
-.pins { display: inline-flex; gap: 3px; }
-.pin { all: unset; display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%;
-  background: #c2255c; color: #fff; font-size: 9px; font-weight: 600; cursor: pointer; }
-.pin:hover { outline: 2px solid #f3b6cb; }
+.issue-line { align-items: center; justify-content: flex-start; }
+.issue-line .pins { margin-left: auto; }
+.pins { display: inline-flex; gap: 2px; }
+.pin { all: unset; display: inline-flex; cursor: pointer; }
+.pin svg { width: 13px; height: 17px; }
+.pin path { fill: #c2255c; }
+.pin circle { fill: #fff; }
+.pin text { fill: #fff; font-size: 8px; font-weight: 700; text-anchor: middle; }
+.pin:hover path { fill: #8f1a44; }
 .del { all: unset; margin-left: auto; color: #a40e26; cursor: pointer; }
 .del:hover { text-decoration: underline; }
 .issue-form { display: flex; flex-direction: column; gap: 6px; padding: 10px 0 12px; border-bottom: 1px solid var(--border);

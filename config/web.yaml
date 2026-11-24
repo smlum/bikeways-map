@@ -6,6 +6,12 @@ basemap: https://tiles.openfreemap.org/styles/positron
 # Initial map view (overridden by the URL hash).
 initial_view: {center: [-75.70, 45.40], zoom: 11}
 
+# The map can't be panned outside this box ([[west, south], [east, north]]), which also stops
+# zooming out much past all of Canada. Canada itself is about [[-141, 42], [-53, 83]].
+max_bounds: [[-160, 32], [-35, 84]]
+# Furthest zoom out. The basemap draws city names from zoom 3 (towns from 6).
+min_zoom: 3
+
 # Map page dataset tabs. source = dataset id (sources.yaml); mode = class (CAN-BICS class) |
 # compare (see compare_key). source_classes: offer the "Source classes" breakdown (the city's own
 # categories under each CAN-BICS class).
@@ -61,3 +67,9 @@ issue_types:
 # responses go to a sheet; see scripts/import_issues.py). {city} and {source_class} are filled in,
 # URL-encoded. Leave unset to hide the link.
 # report_url: "https://docs.google.com/forms/d/e/<form id>/viewform?usp=pp_url&entry.111={city}&entry.222={source_class}"
+
+# One line under the city info: how the data is classified, with a link to the framework's guide.
+classification:
+  text: Classified using the Can-BICS framework
+  link_text: Visual guide
+  url: https://summit.sfu.ca/item/39274
