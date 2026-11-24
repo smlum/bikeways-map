@@ -38,7 +38,7 @@ Audit of `cycle_network_2024.gpkg` + companion CSVs (national, 82,115 rows, ~18,
 8. **Per-row provenance:** source dataset id and source vintage on every row, not only per municipality.
 9. **Changelog and versioning** between vintages (method changes, reclassifications), plus a channel for errata and known issues.
 
-# Can-BICS OSM (2024, 2026): data notes
+# Can-BICS OSM (2024): data notes
 
 | Issue | Detail | Handling |
 |---|---|---|

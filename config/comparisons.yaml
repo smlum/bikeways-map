@@ -11,4 +11,3 @@ defaults:
 
 pairs:
   - {a: ccnd_2024, b: osm_2024}
-  # - {a: osm_2024, b: osm_2026}  # disabled with osm_2026

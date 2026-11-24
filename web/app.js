@@ -13,14 +13,23 @@ async function main() {
   // showNC (class tabs): draw the non-conforming classes.
   const state = { source: null, summary: null, city: null, focus: null, mode: "class",
     cmpSummary: null, summaryB: null, cmpFocus: null, includeNC: false, showNC: true, view: null, showSc: false,
-    table: getParam("panel") === "table", q: "",
     // Issues: list (from the local issues API when serve.py runs, else config.json), draft = the
     // new-issue form, issueSel = selected issue id.
     issues: cfg.issues || [], api: false, draft: null, issueSel: null, issueError: null,
-    issuesOpen: (() => { try { return localStorage.getItem("issuesOpen") !== "0"; } catch { return true; } })() };
+    issuesOpen: (() => { try { return localStorage.getItem("issuesOpen") !== "0"; } catch { return true; } })(),
+    // Issue pins on the map (off: only the selected issue's and the draft's).
+    issuesOnMap: (() => { try { return localStorage.getItem("issuesOnMap") !== "0"; } catch { return true; } })(),
+    // Who issues are saved as (name or "Anonymous Otter"); set on the first issue, editable in the panel.
+    by: (() => { try { return localStorage.getItem("issuesBy") || ""; } catch { return ""; } })() };
   const $ = (id) => document.getElementById(id);
 
   document.title = $("title").textContent = cfg.title;
+
+  // About dialog (index.html): opens from the panel; closes with ×, Esc or a click outside it.
+  const about = $("about");
+  document.querySelector(".about-open").onclick = () => about.showModal();
+  about.querySelector(".about-close").onclick = () => about.close();
+  about.onclick = (e) => { if (e.target === about) about.close(); }; // the backdrop is the dialog itself
 
   const hadViewInUrl = !!location.hash; // read before MapLibre writes its own hash
   const map = new maplibregl.Map({
@@ -53,9 +62,7 @@ async function main() {
 
   const search = citySearch($("city-search"), $("city-list"), {
     getPlaces: () => state.summary?.places, getCurrent: () => state.city,
-    onPick: (id) => setCity(id, { fit: !state.table }),
-    filtering: () => state.table,
-    onFilter: (q) => { state.q = q; renderTable(); },
+    onPick: (id) => setCity(id, { fit: true }),
   });
 
   function setView(v) {
@@ -406,7 +413,8 @@ async function main() {
   function newIssue() {
     const f = state.cmpFocus, cls = state.focus?.cls ?? f?.cls;
     const missing = f?.side === "b";
-    state.draft = { place: state.city, placeName: state.summary?.places[state.city]?.name, dataset: defaultDataset(),
+    const one = state.city !== ALL; // all cities: the form asks which
+    state.draft = { place: one ? state.city : "", placeName: one ? state.summary?.places[state.city]?.name : "", dataset: defaultDataset(),
       type: missing ? "missing" : "wrong_class", class: missing ? "" : cls ?? "",
       suggested_class: missing ? f.cls : f?.other ?? "", source_class: state.focus?.sc ?? "", note: "", examples: [] };
     Object.assign(state, { issueError: null, issuesOpen: true, issueSel: null });
@@ -446,10 +454,31 @@ async function main() {
   }
 
   let exampleToken = null;
+
+  // Name saved with new issues, and a random id for this browser (stored with each issue, never
+  // shown), so everything from one browser can be found or undone even when anonymous.
+  function setBy(name) {
+    state.by = name;
+    try { localStorage.setItem("issuesBy", name); } catch {}
+  }
+  function browserId() {
+    try {
+      let id = localStorage.getItem("issuesBrowser");
+      if (!id) localStorage.setItem("issuesBrowser", (id = [...crypto.getRandomValues(new Uint8Array(8))].map((b) => b.toString(16).padStart(2, "0")).join("")));
+      return id;
+    } catch { return undefined; }
+  }
   const issueHandlers = {
     toggle: () => {
       state.issuesOpen = !state.issuesOpen;
       try { localStorage.setItem("issuesOpen", state.issuesOpen ? "1" : "0"); } catch {}
+      refresh();
+    },
+    // redraw = false when typed: saving on blur mustn't redraw the panel under a click (e.g. Add issue).
+    setBy: (name, redraw = true) => { setBy(name); if (redraw) refresh(); },
+    toggleOnMap: (on) => {
+      state.issuesOnMap = on;
+      try { localStorage.setItem("issuesOnMap", on ? "1" : "0"); } catch {}
       refresh();
     },
     newIssue,
@@ -470,14 +499,17 @@ async function main() {
     },
     draftChange: (vals) => {
       const d = state.draft;
-      const relevant = ["dataset", "type", "class", "suggested_class"].some((k) => (vals[k] ?? "") !== (d[k] ?? ""));
+      const relevant = ["place", "dataset", "type", "class", "suggested_class"].some((k) => k in vals && (vals[k] ?? "") !== (d[k] ?? "")); // only fields the form has (no City field for one city)
       Object.assign(d, vals);
       if (relevant) refresh(); // the "same as an existing issue" hint depends on these
     },
     save: async (vals) => {
       const d = { ...state.draft, ...vals };
+      if (!d.place) { state.issueError = "Choose a city"; return refresh(); }
+      if (!state.by) setBy(IssuesPanel.anonymousName()); // no name given at the top of the panel
       const issue = { place: d.place, dataset: d.dataset || defaultDataset(), type: d.type, class: d.class,
-        suggested_class: d.suggested_class, source_class: d.source_class.trim(), note: d.note.trim(), examples: d.examples };
+        suggested_class: d.suggested_class, source_class: d.source_class.trim(), note: d.note.trim(), examples: d.examples,
+        by: state.by, by_id: browserId() };
       if (await issueApi({ op: "add", issue })) {
         state.draft = null;
         state.issueSel = state.issues.at(-1)?.id ?? null;
@@ -514,7 +546,8 @@ async function main() {
       map.on("mousemove", "issue-pins", () => (map.getCanvas().style.cursor = "pointer"));
     }
     const anySel = !!state.issueSel;
-    const feats = cityIssues().flatMap((i) => (i.examples || []).map((ex) => ({ type: "Feature",
+    const shown = cityIssues().filter((i) => state.issuesOnMap || i.id === state.issueSel);
+    const feats = shown.flatMap((i) => (i.examples || []).map((ex) => ({ type: "Feature",
       geometry: { type: "Point", coordinates: [ex.lng, ex.lat] },
       properties: { issue: i.id, sel: i.id === state.issueSel, draft: false, anySel } })));
     (state.draft?.examples || []).forEach((ex) => feats.push({ type: "Feature",
@@ -527,7 +560,8 @@ async function main() {
     const name = state.summary?.places[state.city]?.name ?? "";
     IssuesPanel.render($("issues"), {
       cfg, title: name, issues: cityIssues(), draft: state.draft, selected: state.issueSel,
-      canSave: state.api, canAdd: !!state.city && state.city !== ALL, error: state.issueError, open: state.issuesOpen, reportUrl: reportUrl(),
+      canSave: state.api, canAdd: !!state.city, error: state.issueError, open: state.issuesOpen, onMap: state.issuesOnMap, by: state.by, reportUrl: reportUrl(),
+      places: realPlaces(state.summary?.places).map(([id, p]) => ({ id, name: p.name })).sort((a, b) => a.name.localeCompare(b.name)),
       all: state.city === ALL, placeName: (id) => state.summary?.places[id]?.name ?? id, on: issueHandlers,
       datasets: issueDatasets(), defaultDataset: defaultDataset(),
     });
@@ -539,7 +573,7 @@ async function main() {
     renderIssues();
     Profile.render($("info"), {
       data: state.summary?.places[state.city], classes: cfg.classes, focus: state.focus,
-      onFocus: setFocus, issues: cityIssues(),
+      onFocus: setFocus, issues: state.city === ALL ? [] : cityIssues(), // no issue dots for all cities: too busy
       scAvailable: !!state.view?.source_classes && state.city !== ALL, showSc: state.showSc,
       onToggleSc: (on) => { state.showSc = on; refresh(); },
       showNC: state.showNC, classification: cfg.classification,
@@ -553,33 +587,8 @@ async function main() {
       totalB: state.mode === "compare" && state.summaryB?.places[state.city]
         ? canbicsKm(state.summaryB.places[state.city], classes) : null,
     });
-    renderTable();
   }
 
-  // --- table (expanded panel) ---------------------------------------------------
-  // The Table tab expands the panel over the map; it follows the same view tabs and search box.
-  function renderTable() {
-    if (!state.table) return;
-    CityTable.render($("table"), {
-      cfg, mode: state.mode, summary: state.summary, summaryB: state.summaryB, cmpKm,
-      q: state.q, city: state.city, issues: state.issues, labels: { a: A(), b: B() },
-    });
-  }
-  function setPanel(table) {
-    state.table = table;
-    state.q = "";
-    document.body.classList.toggle("table-open", table);
-    $("panel-tabs").querySelectorAll("a").forEach((a) =>
-      a.setAttribute("aria-current", (a.dataset.panel === "table") === table ? "page" : "false"));
-    setParam("panel", table ? "table" : null);
-    search.setFiltering(table, state.summary?.places[state.city]?.name);
-    if (table) { areaTip.remove(); net.popup.remove(); other.popup.remove(); }
-    renderTable();
-  }
-  $("panel-tabs").querySelectorAll("a").forEach((a) => (a.onclick = (e) => {
-    e.preventDefault();
-    setPanel(a.dataset.panel === "table");
-  }));
 
   function setFocus(f) { state.focus = f; state.cmpFocus = null; state.issueSel = null; refresh(); }
 
@@ -622,7 +631,6 @@ async function main() {
     firstLoad = false;
   }
 
-  setPanel(state.table);
   const initialView = views.find((v) => v.id === getParam("view")) || views[0];
   $("views").querySelectorAll("button").forEach((x) => // show the tab before the map has loaded
     x.setAttribute("aria-pressed", x.dataset.view === initialView.id));

@@ -128,4 +128,13 @@ def run() -> None:
         "issues": load_issues([m["id"] for m in manifest]),
     }
     (WEB_DATA / "config.json").write_text(json.dumps(out, indent=2, ensure_ascii=False))
+
+    # web/data holds exactly what the app uses: drop files from sources or pairs no longer configured.
+    keep = {"config.json", "areas.geojson", "canada.geojson"}
+    keep |= {f for m in manifest for f in (m["tiles"], m["summary"]) if f}
+    keep |= {f for c in comparisons for f in (c["tiles"], c["summary"])}
+    for f in WEB_DATA.iterdir():
+        if f.is_file() and f.name not in keep:
+            f.unlink()
+            print(f"[export] removed stale web/data/{f.name}")
     print(f"[export] -> web/data/ ({len(manifest)} sources, {len(out['issues'])} issues)")

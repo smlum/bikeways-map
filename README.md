@@ -5,7 +5,7 @@ Web map for validating the Canadian Cycling Network Database (CCND) against live
 ## Data
 
 - CCND 2024 — Statistics Canada
-- Can-BICS OpenStreetMap 2024 and 2026 — Can-BICS national data (ODbL)
+- Can-BICS OpenStreetMap 2024 — CHATR Lab, from OpenStreetMap (ODbL)
 - 2021 census subdivision boundaries — Statistics Canada
 
 ## Setup

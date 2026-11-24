@@ -88,16 +88,3 @@ osm_2024:
     source_url: https://www.arcgis.com/home/item.html?id=efaf04c6e3914c059bfb7298e784a89c
     license: https://opendatacommons.org/licenses/odbl/
     attribution: Data © OpenStreetMap contributors (ODbL). OSM source date 2024-01-15.
-
-# Disabled for now (uncomment to restore).
-# osm_2026:
-#   <<: *osm_common
-#   vintage: 2026
-#   label: Can-BICS OpenStreetMap (2026)
-#   path: data/raw/canbics_osm/2026/extracted/OSM_CAN_BICS_v2026.shp
-#   provenance:
-#     provider: OSM, CHATR Lab
-#     year_updated: "2026"
-#     source_url: https://www.arcgis.com/home/item.html?id=efaf04c6e3914c059bfb7298e784a89c
-#     license: https://opendatacommons.org/licenses/odbl/
-#     attribution: Data © OpenStreetMap contributors (ODbL). OSM source date 2026-01-12.

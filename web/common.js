@@ -215,57 +215,79 @@ async function showOsmTags(box) {
   }
 }
 
-/**
- * City search box with native datalist autocomplete. Empties on focus (current city stays as
- * placeholder) so you can just type; restores on blur.
- */
-// filtering(): while true (table view) the box is a free-text filter: typing calls onFilter(text),
-// and focus/blur leave the text alone.
-// Accents are ignored when searching: "quebe" finds Québec City. The native suggestion list matches
-// accents exactly, so while typing, a name that only matches without accents is offered unaccented
-// ("Quebec City"); picking it still selects the place and shows its real name.
-function citySearch(input, datalist, { getPlaces, getCurrent, onPick, filtering = () => false, onFilter }) {
-  let names = [];
-  const byName = () => Object.fromEntries(
-    Object.entries(getPlaces() || {}).map(([id, p]) => [fold(p.name), id]));
-  const fillOptions = (q = "") => {
-    q = q.trim().toLowerCase();
-    datalist.innerHTML = names.map((n) => {
-      const v = !q || n.toLowerCase().includes(q) || !fold(n).includes(fold(q)) ? n : unaccent(n);
-      return `<option value="${esc(v)}"></option>`;
-    }).join("");
-  };
-  input.onchange = () => {
-    const id = byName()[fold(input.value.trim())];
+// City search: a text box with its own suggestion list (not the browser's datalist, which can only
+// match the exact text it shows). Matching ignores accents and case ("montreal" finds Montréal) and
+// names always show as spelled. Names starting with the text come first. Arrow keys move, Enter
+// picks (the top match by default), Esc leaves. Empties on focus (current city stays as placeholder)
+// so you can just type; restores on blur.
+function citySearch(input, list, { getPlaces, getCurrent, onPick }) {
+  let names = []; // [{id, name}], All cities first
+  let matches = [], active = -1;
+  input.setAttribute("role", "combobox");
+  input.setAttribute("aria-controls", list.id);
+  input.setAttribute("aria-autocomplete", "list");
+
+  function render() {
+    const q = fold(input.value.trim());
+    const starts = [], contains = [];
+    for (const p of names) {
+      const n = fold(p.name);
+      if (!q || n.startsWith(q)) starts.push(p);
+      else if (n.includes(q)) contains.push(p);
+    }
+    matches = [...starts, ...contains];
+    active = Math.min(active, matches.length - 1);
+    list.innerHTML = matches.map((p, i) => `<li role="option" data-id="${esc(p.id)}"
+      ${i === active ? `class="active" aria-selected="true"` : ""}>${esc(p.name)}</li>`).join("");
+    list.hidden = !matches.length || document.activeElement !== input;
+    input.setAttribute("aria-expanded", String(!list.hidden));
+    list.querySelector(".active")?.scrollIntoView({ block: "nearest" });
+  }
+  function pick(id) {
     if (!id) return;
+    list.hidden = true;
     onPick(id);
     input.blur();
+  }
+
+  input.oninput = () => { active = input.value.trim() ? 0 : -1; render(); };
+  input.onkeydown = (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!matches.length) return;
+      active = (active + (e.key === "ArrowDown" ? 1 : -1) + matches.length) % matches.length;
+      render();
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      pick(matches[active]?.id ?? names.find((p) => fold(p.name) === fold(input.value.trim()))?.id);
+    } else if (e.key === "Escape") {
+      input.blur();
+    }
   };
-  input.oninput = () => filtering() ? onFilter?.(input.value) : fillOptions(input.value);
+  // mousedown, not click: picking must happen before the box loses focus (which hides the list).
+  list.onmousedown = (e) => {
+    e.preventDefault();
+    pick(e.target.closest("li")?.dataset.id);
+  };
   input.onfocus = () => {
-    if (filtering()) return;
     input.placeholder = input.value || "Search a city…";
     input.value = "";
+    active = -1;
+    render();
   };
   input.onblur = () => {
-    if (filtering()) return;
+    list.hidden = true;
+    input.setAttribute("aria-expanded", "false");
     const p = (getPlaces() || {})[getCurrent()];
     if (p) input.value = p.name;
     input.placeholder = "Search a city…";
   };
   return {
     setOptions(places) {
-      names = realPlaces(places).map(([, p]) => p.name).sort((a, b) => a.localeCompare(b));
-      if (places?.[ALL]) names.unshift(places[ALL].name);
-      fillOptions();
+      names = realPlaces(places).map(([id, p]) => ({ id, name: p.name })).sort((a, b) => a.name.localeCompare(b.name));
+      if (places?.[ALL]) names.unshift({ id: ALL, name: places[ALL].name });
     },
-    show(name) { if (document.activeElement !== input && !filtering()) input.value = name; },
-    // Switch between picking a city and filtering the table.
-    setFiltering(on, name) {
-      input.value = on ? "" : name ?? "";
-      input.placeholder = on ? "Filter cities…" : "Search a city…";
-      if (on) input.removeAttribute("list"); else input.setAttribute("list", datalist.id);
-    },
+    show(name) { if (document.activeElement !== input) input.value = name; },
   };
 }
 
@@ -320,9 +342,8 @@ function lineAt(map, pt, layer, keep = () => true) {
     .find((f) => keep(f.properties));
 }
 
-// Text without accents ("Québec" -> "Quebec"); fold() also lowercases, for accent-blind matching.
-const unaccent = (s) => String(s ?? "").normalize("NFD").replace(/\p{M}/gu, "");
-const fold = (s) => unaccent(s).toLowerCase();
+// Lowercase text without accents ("Québec" -> "quebec"), for accent-blind matching.
+const fold = (s) => String(s ?? "").normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 
 // Divider above the non-conforming classes: a checkbox that shows/hides them, with their total km.
 // The caller wires the change event on `.nc-divider input`.

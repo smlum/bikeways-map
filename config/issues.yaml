@@ -10,11 +10,11 @@
 #   class:           optional; the CAN-BICS class the data gives (config/classes.yaml slug)
 #   suggested_class: optional; what it should be: a class slug, or `exclude` (not cycling infrastructure)
 #   source_class:    optional; the city's own category, exactly as in the data
-#   note:            optional short description
+#   note:            optional; plain text up to 200 characters (letters, digits, , . / ? ! ' - ( ) : ;)
 #   examples:        optional list of locations: lat, lng, heading (Street View), segment id,
 #                    class / other_class / status as shown when clicked
 #   date:            YYYY-MM-DD (set automatically)
-#   by, link:        optional
+#   by:              optional; who added it (plain text, up to 40 characters)
 #
 issues:
 - id: 0547721f
@@ -457,4 +457,58 @@ issues:
     other_class: major_shared_roadway
     status: differs
     source_class: on street bicycle route
+  date: '2026-11-24'
+- id: 5a4ee46e
+  place: halifax
+  dataset: ccnd_2024
+  type: wrong_class
+  class: multi_use_path
+  source_class: mupath
+  suggested_class: gravel_trail
+  examples:
+  - lat: 44.671714
+    lng: -63.79368
+    heading: 85
+    segment: ccnd_2024-5fbbe7d4dcf0
+    class: multi_use_path
+    other_class: gravel_trail
+    status: differs
+    source_class: mupath
+  date: '2026-11-24'
+- id: 82ed6930
+  place: laval
+  dataset: osm_2024
+  type: wrong_class
+  class: multi_use_path
+  source_class: piste cyclable
+  suggested_class: bike_path
+  by: test
+  examples:
+  - lat: 45.614972
+    lng: -73.753198
+    heading: 146
+    segment: ccnd_2024-566fd8a271d5
+    class: cycle_track
+    other_class: multi_use_path
+    status: differs
+    source_class: piste cyclable
+  date: '2026-11-24'
+- id: d064253c
+  place: laval
+  dataset: ccnd_2024
+  type: wrong_class
+  class: cycle_track
+  source_class: piste cyclable
+  suggested_class: bike_path
+  note: Bike path, cycle track and mup all classed as piste cyclable
+  by: test
+  examples:
+  - lat: 45.614972
+    lng: -73.753198
+    heading: 146
+    segment: ccnd_2024-566fd8a271d5
+    class: cycle_track
+    other_class: multi_use_path
+    status: differs
+    source_class: piste cyclable
   date: '2026-11-24'

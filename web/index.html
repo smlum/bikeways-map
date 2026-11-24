@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bikeways map</title>
+  <meta name="description" content="Unofficial tool to explore Statistics Canada's Canadian Cycling Network Database (2024), check it against CHATR Lab's Can-BICS OpenStreetMap network, and log issues.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚲</text></svg>">
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
   <link rel="stylesheet" href="style.css">
   <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
@@ -13,19 +15,60 @@
   <div id="map"></div>
   <aside id="panel">
     <div class="panel-top">
-      <div class="title-row"><h1 id="title"></h1>
-        <nav class="tabs" id="panel-tabs"><a href="?" data-panel="map" aria-current="page">Map</a><a href="?panel=table" data-panel="table">Table</a></nav></div>
-      <input id="city-search" list="city-list" placeholder="Search a city…" autocomplete="off" aria-label="City">
-      <datalist id="city-list"></datalist>
+      <div class="title-row"><h1 id="title"></h1></div>
+      <!-- One-line intent; "About" opens the full text (#about dialog, below). -->
+      <p class="about-line">Explore the CCND, check it against OpenStreetMap, log issues.
+        <button type="button" class="about-open">About</button></p>
+      <div class="city-search">
+        <input id="city-search" placeholder="Search a city…" autocomplete="off" spellcheck="false" aria-label="City">
+        <ul id="city-list" class="city-list" role="listbox" hidden></ul>
+      </div>
       <div class="seg-toggle" id="views" role="radiogroup" aria-label="Dataset"></div>
     </div>
     <div id="info"></div>
-    <div id="table"></div>
   </aside>
   <aside id="issues"></aside>
+  <dialog id="about" aria-labelledby="about-title">
+    <header><h2 id="about-title">About</h2><button type="button" class="about-close" aria-label="Close">×</button></header>
+    <div class="about-body">
+      <p>An (unofficial) tool for exploring Statistics Canada's <a href="https://www150.statcan.gc.ca/n1/pub/23-26-0004/232600042024001-eng.htm" target="_blank" rel="noopener">Canadian Cycling Network Database</a>.
+        The CCND is made up of municipal open data, classified using 
+          <a href="https://www.canada.ca/en/public-health/services/reports-publications/health-promotion-chronic-disease-prevention-canada-research-policy-practice/vol-40-no-9-2020/canbics-classification-system-naming-convention-cycling-infrastructure.html" target="_blank" rel="noopener">Can-BICS</a>.</p>
+      <p>
+        The tool also displays <a href="https://www.sfu.ca/fhs/news-events/news/2023/fhs-researchers-develop-first-national-open-source-dataset-for-bike-infrastructure.html" target="_blank" rel="noopener">CHATR Lab</a>'s
+        <a href="https://www.arcgis.com/home/item.html?id=efaf04c6e3914c059bfb7298e784a89c" target="_blank" rel="noopener">Can-BICS OpenStreetMap</a> network for comparison, labelled as OSM.</p>
+      <h3>Using it</h3>
+      <ul>
+        <li>Pick a city with the search box or by clicking it on the map.</li>
+        <li>CCND and OSM show each network by Can-BICS class.</li> 
+        <li>Compare shows where they match or differ.</li>  
+      </ul>
+      <h3>Add an issue</h3>
+      <ul>
+        
+        <li>Click a segment for its details and to add an issue.</li>
+      </ul>
+      <h3>Data</h3>
+      <ul>
+        <li><a href="https://www150.statcan.gc.ca/n1/pub/23-26-0004/232600042024001-eng.htm" target="_blank" rel="noopener">CCND</a>,
+          Statistics Canada: compiled Nov 2023–Mar 2024 from 75 municipal open datasets published 2018–2024.
+          Released under the
+          <a href="https://open.canada.ca/en/open-government-licence-canada" target="_blank" rel="noopener">Open Government Licence – Canada</a>.
+          Municipal licences listed in the
+          <a href="https://www150.statcan.gc.ca/n1/pub/23-26-0004/232600042024001-eng.htm" target="_blank" rel="noopener">CCND download</a>.</li>
+        <li><a href="https://www.arcgis.com/home/item.html?id=efaf04c6e3914c059bfb7298e784a89c" target="_blank" rel="noopener">Can-BICS OpenStreetMap</a>,
+          <a href="https://www.sfu.ca/fhs/news-events/news/2023/fhs-researchers-develop-first-national-open-source-dataset-for-bike-infrastructure.html" target="_blank" rel="noopener">CHATR Lab</a>:
+          classified from OpenStreetMap as of 15 Jan 2024. © OpenStreetMap contributors,
+          <a href="https://opendatacommons.org/licenses/odbl/" target="_blank" rel="noopener">ODbL</a>.</li>
+        <li>Classes follow the Can-BICS framework
+          (see CHATR Lab's <a href="https://summit.sfu.ca/item/39274" target="_blank" rel="noopener">visual guide</a>).</li>
+        <li>Boundaries: 2021 census subdivisions, Statistics Canada.</li>
+      </ul>
+      <p class="made-by">Made by <a href="https://github.com/smlum" target="_blank" rel="noopener">Sam Lumley</a></p>
+    </div>
+  </dialog>
   <script src="common.js"></script>
   <script src="profile.js"></script>
-  <script src="table.js"></script>
   <script src="issues.js"></script>
   <script src="app.js"></script>
 </body>

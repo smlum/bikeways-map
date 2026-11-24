@@ -4,8 +4,16 @@
 // state, saving (scripts/serve.py issues API) and the map.
 
 const IssuesPanel = (() => {
-  // ctx: {cfg, title, issues, draft, selected, canSave, canAdd, error, open, reportUrl, placeName(id),
-  //       on: {toggle, newIssue, select, selectExample, save, cancel, addToExisting, del, draftChange}}
+  // "Anonymous Otter" etc., for people who'd rather not give a name.
+  const ANIMALS = ["Beaver", "Moose", "Loon", "Otter", "Lynx", "Heron", "Caribou", "Puffin", "Marten", "Bison",
+    "Orca", "Hare", "Owl", "Fox", "Elk", "Panda"];
+  const anonymousName = () => `Anonymous ${ANIMALS[Math.floor(Math.random() * ANIMALS.length)]}`;
+  // Notes: letters (accented too), digits, spaces and , . / ? ! ' - ( ) : ; only, up to NOTE_MAX.
+  const NOTE_MAX = 200, BY_MAX = 40;
+  const NOTE_BAD = /[^\p{L}\p{M}\p{N} ,./?!'’\-():;]/gu;
+
+  // ctx: {cfg, title, issues, draft, selected, canSave, canAdd, error, open, onMap, by, places, reportUrl, placeName(id),
+  //       on: {toggle, toggleOnMap, newIssue, select, selectExample, save, cancel, addToExisting, del, draftChange}}
   function render(el, ctx) {
     const { cfg, issues, draft, on } = ctx;
     const classes = cfg.classes.classes;
@@ -15,21 +23,31 @@ const IssuesPanel = (() => {
       ? `<span class="swatch" style="background:${classInfo(cfg, slug).color}"></span>` : "";
     const types = cfg.issue_types || {};
 
+    // Always shown, open or not: title, count and place; Add issue "as <name>"; Show / Hide issues.
+    // The name is asked once (or Anonymous), then shown next to Add issue and editable in place;
+    // it's remembered in this browser.
     const head = `<header class="issues-head">
-        <button class="issues-toggle" title="${ctx.open ? "Hide" : "Show"} issues">
-          <h2>Issues${issues.length ? ` <span class="count">${issues.length}</span>` : ""}</h2>
-          <span class="muted">${esc(ctx.title)}</span><span class="chev">${ctx.open ? "▾" : "▸"}</span></button>
+        <h2>Issues</h2>${issues.length ? `<span class="count">${issues.length}</span>` : ""}
+        <span class="muted issues-place">${esc(ctx.title)}</span>
+        <label class="on-map" title="Show issue locations on the map"><input type="checkbox" ${ctx.onMap ? "checked" : ""}> On map</label>
       </header>`;
-    if (!ctx.open) { el.innerHTML = head; wire(); return; }
-
-    const add = !draft && ctx.canAdd ? `<div class="issues-add"><button class="new-issue">Add issue</button>
-      <span class="muted">or click a segment</span></div>
-      ${ctx.canSave ? "" : `<p class="muted small">Read-only: saving needs the local server (scripts/serve.py).</p>`}` : "";
+    const by = !ctx.canSave ? "" : ctx.by
+      ? `<label class="by-name" title="Name saved with your issues (this browser only)">as
+          <input class="by-input" value="${esc(ctx.by)}" maxlength="${BY_MAX}" size="${Math.max(4, ctx.by.length)}" aria-label="Your name"></label>`
+      : `<label class="by-name">as <input class="by-input by-new" maxlength="${BY_MAX}" size="9" placeholder="your name" aria-label="Your name"></label>
+          <button type="button" class="by-anon">Anonymous</button>`;
+    const addBtn = !draft && ctx.canAdd ? `<button class="new-issue">Add issue</button>` : "";
+    const toggle = issues.length ? `<button class="issues-toggle">${ctx.open ? "Hide issues" : "Show issues"}</button>` : "";
+    const top = `<div class="issues-top">
+        ${addBtn || by ? `<div class="issues-add">${addBtn}${by}</div>` : ""}
+        ${ctx.canAdd && !ctx.canSave ? `<p class="muted small">Read-only: saving needs the local server (scripts/serve.py).</p>` : ""}
+        ${toggle}</div>`;
     // One section per dataset (baseline first); issues without a dataset belong to the baseline.
     const datasets = ctx.datasets || [];
     const dsOf = (i) => i.dataset || ctx.defaultDataset;
     const shortOf = (id) => datasets.find((d) => d.id === id)?.short ?? id;
     const form = draft ? draftForm() : "";
+    if (!ctx.open && !draft) { el.innerHTML = head + top; wire(); return; }
     const order = [...datasets.map((d) => d.id), ...new Set(issues.map(dsOf))].filter((v, n, a) => a.indexOf(v) === n);
     const byDataset = (its, head) => order.map((ds) => {
       const g = its.filter((i) => dsOf(i) === ds);
@@ -48,7 +66,8 @@ const IssuesPanel = (() => {
             ${byDataset(its, (ds) => mixed ? `<h4 class="issue-ds">${esc(shortOf(ds))}</h4>` : "")}</section>`;
         }).join("");
     const report = ctx.reportUrl ? `<a class="small" href="${esc(ctx.reportUrl)}" target="_blank" rel="noopener">Report an issue ↗</a>` : "";
-    el.innerHTML = `${head}<div class="issues-body">${add}${form}${list}${report}</div>`;
+    const body = form + (ctx.open ? list + report : "");
+    el.innerHTML = `${head}${top}${body ? `<div class="issues-body">${body}</div>` : ""}`;
     wire();
 
     // What the issue is about; the type is shown separately (e.g. Missing infrastructure + Multi-use path).
@@ -61,15 +80,14 @@ const IssuesPanel = (() => {
     function item(i) {
       const sel = ctx.selected === i.id;
       const ex = i.examples || [];
-      // Map-marker buttons, one per example location (numbered when there are several).
-      const marker = (n) => `<svg viewBox="0 0 14 18" aria-hidden="true"><path d="M7 17.5C7 17.5 1 10.6 1 6.6a6 6 0 0 1 12 0c0 4-6 10.9-6 10.9z"/>
-        ${ex.length > 1 ? `<text x="7" y="9.5">${n + 1}</text>` : `<circle cx="7" cy="6.6" r="2.2"/>`}</svg>`;
-      const pins = ex.map((e, n) => `<button class="pin" data-ex="${n}" title="Show example ${n + 1} on the map">${marker(n)}</button>`).join("");
-      // Card: type with example markers on the right; what it is;
+      // "Example" buttons, one per example location ("Example 1", "Example 2"… when there are several).
+      const pins = ex.map((e, n) => `<button class="pin" data-ex="${n}" title="Show on the map">Example${ex.length > 1 ? ` ${n + 1}` : ""}</button>`).join("");
+      // Card: type with example buttons on the right; what it is;
       // note; Delete when selected.
       const del = sel && ctx.canSave && i.id ? `<button class="del" title="Delete issue">Delete</button>` : "";
       return `<li class="issue-item ${sel ? "selected" : ""}" data-id="${esc(i.id ?? "")}">
         <div class="issue-line"><span class="label label-${esc(i.type)}">${esc(types[i.type] ?? i.type)}</span>
+          ${i.by ? `<span class="issue-by">${esc(i.by)}</span>` : ""}
           ${pins ? `<span class="pins">${pins}</span>` : ""}</div>
         <div class="issue-title">${title(i)}</div>
         ${i.note ? `<p>${esc(i.note)}</p>` : ""}
@@ -84,11 +102,13 @@ const IssuesPanel = (() => {
         ...extra.map(([v, t]) => opt(v, t, cur))].join("");
       const ex = d.examples?.[0];
       const ds = d.dataset || ctx.defaultDataset;
-      const match = issues.find((i) => i.id && dsOf(i) === ds && i.type === d.type && (i.class ?? "") === (d.class ?? "")
+      const match = d.place && issues.find((i) => i.id && i.place === d.place && dsOf(i) === ds && i.type === d.type && (i.class ?? "") === (d.class ?? "")
         && (i.suggested_class ?? "") === (d.suggested_class ?? ""));
       const sv = ex && streetViewUrl(cfg, ex);
       return `<form class="issue-form">
         <div class="form-title">New issue${d.placeName ? ` · ${esc(d.placeName)}` : ""}</div>
+        ${d.placeName ? "" : `<label>City <select name="place">${[opt("", "Choose a city", d.place),
+          ...(ctx.places || []).map((p) => opt(p.id, p.name, d.place))].join("")}</select></label>`}
         ${match ? `<div class="match">Same as an existing issue: <b>${title(match)}</b>
           ${ex ? `<button type="button" class="add-to" data-id="${esc(match.id)}">Add as example</button>` : ""}</div>` : ""}
         <label>Dataset <select name="dataset">${datasets.map((x) => opt(x.id, x.short, ds)).join("")}</select></label>
@@ -96,7 +116,7 @@ const IssuesPanel = (() => {
         <label>${esc(shortOf(ds))} says <select name="class">${classOpts(d.class)}</select></label>
         <label>Should be <select name="suggested_class">${classOpts(d.suggested_class, [["exclude", "Not cycling infrastructure"]])}</select></label>
         <label>Source class <input name="source_class" value="${esc(d.source_class ?? "")}" placeholder="optional"></label>
-        <label>Note <textarea name="note" rows="2" placeholder="optional">${esc(d.note ?? "")}</textarea></label>
+        <label>Note <textarea name="note" rows="2" maxlength="${NOTE_MAX}" placeholder="optional, up to ${NOTE_MAX} characters">${esc(d.note ?? "")}</textarea></label>
         ${ex ? `<div class="form-ex">Example: ${esc(ex.lat.toFixed(5))}, ${esc(ex.lng.toFixed(5))}
           ${sv ? ` · <a href="${esc(sv)}" target="_blank" rel="noopener">Street View ↗</a>` : ""}</div>` : ""}
         ${ctx.error ? `<p class="form-error">${esc(ctx.error)}</p>` : ""}
@@ -106,10 +126,25 @@ const IssuesPanel = (() => {
     }
 
     function wire() {
-      el.querySelector(".issues-toggle").onclick = on.toggle;
+      el.querySelector(".issues-toggle")?.addEventListener("click", on.toggle);
+      el.querySelector(".on-map input").onchange = (e) => on.toggleOnMap(e.target.checked);
+      el.querySelectorAll(".by-input").forEach((inp) => inp.addEventListener("input", () => {
+        const v = inp.value.replace(NOTE_BAD, "");
+        if (v !== inp.value) inp.value = v;
+      }));
+      const byInput = el.querySelector(".by-input");
+      if (byInput) byInput.onchange = () => { // Enter or leaving the box; empty -> anonymous (or unchanged if new)
+        const v = byInput.value.trim();
+        if (v || ctx.by) on.setBy(v || anonymousName(), false);
+      };
+      el.querySelector(".by-anon")?.addEventListener("click", () => on.setBy(anonymousName()));
       el.querySelector(".new-issue")?.addEventListener("click", on.newIssue);
       const f = el.querySelector(".issue-form");
       if (f) {
+        f.note.addEventListener("input", () => { // same rule as the server (scripts/serve.py)
+          const v = f.note.value.replace(NOTE_BAD, "");
+          if (v !== f.note.value) f.note.value = v;
+        });
         f.oninput = () => on.draftChange(Object.fromEntries(new FormData(f)));
         f.onsubmit = (e) => { e.preventDefault(); on.save(Object.fromEntries(new FormData(f))); };
         f.querySelector(".cancel").onclick = on.cancel;
@@ -127,7 +162,7 @@ const IssuesPanel = (() => {
     }
   }
 
-  return { render };
+  return { render, anonymousName };
 })();
 
 // Street View link for an issue example (web.yaml links entry labelled "Open Street View").
