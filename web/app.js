@@ -16,9 +16,10 @@ async function main() {
     // Issues: list (from the local issues API when serve.py runs, else config.json), draft = the
     // new-issue form, issueSel = selected issue id.
     issues: cfg.issues || [], api: false, draft: null, issueSel: null, issueError: null,
-    issuesOpen: (() => { try { return localStorage.getItem("issuesOpen") !== "0"; } catch { return true; } })(),
-    // Issue pins on the map (off: only the selected issue's and the draft's).
-    issuesOnMap: (() => { try { return localStorage.getItem("issuesOnMap") !== "0"; } catch { return true; } })(),
+    // Issues list open, and issue pins on the map (off: only the selected issue's and the draft's).
+    // Both off until turned on; the choice is remembered in this browser.
+    issuesOpen: (() => { try { return localStorage.getItem("issuesOpen") === "1"; } catch { return false; } })(),
+    issuesOnMap: (() => { try { return localStorage.getItem("issuesOnMap") === "1"; } catch { return false; } })(),
     // Who issues are saved as (name or "Anonymous Otter"); set on the first issue, editable in the panel.
     by: (() => { try { return localStorage.getItem("issuesBy") || ""; } catch { return ""; } })() };
   const $ = (id) => document.getElementById(id);
@@ -34,14 +35,16 @@ async function main() {
   const hadViewInUrl = !!location.hash; // read before MapLibre writes its own hash
   const map = new maplibregl.Map({
     container: "map", style: cfg.basemap, hash: true,
-    center: cfg.initial_view.center, zoom: cfg.initial_view.zoom, maxBounds: cfg.max_bounds, minZoom: cfg.min_zoom,
+    bounds: cfg.initial_bounds, fitBoundsOptions: { padding: panelPadding() },
+    maxBounds: cfg.max_bounds, minZoom: cfg.min_zoom,
   });
   map.addControl(new maplibregl.NavigationControl(), "bottom-right");
   window.map = map; // for debugging in devtools
   // Only the selected city's segments are clickable; elsewhere a click picks the city (see below).
   // In compare mode the popup reads "<a> says … / <b> says …" (see cmpTitle, matchRows).
   const net = new Network(map, cfg, {
-    interactive: (p) => (state.city === ALL || p.place === state.city) && !ncHidden(p),
+    // All cities: no line is clickable; hovering / clicking a city's area picks the city instead.
+    interactive: (p) => state.city !== ALL && p.place === state.city && !ncHidden(p),
     popupTitle: (p) => state.mode === "compare" ? cmpTitle(p) : undefined,
     popupLead: (p) => state.mode === "compare" ? matchRows(p) : "",
     popupAction: (p, vars) => issueButton(p, vars, state.mode === "compare" ? "cmp" : state.source?.id === ck?.b ? "b" : "a"),
@@ -117,7 +120,7 @@ async function main() {
   const areaTip = new maplibregl.Popup({ closeButton: false, closeOnClick: false, className: "area-tip", offset: 14 });
   let hovered = null;
   const onLine = (pt) => net.featureAt(pt)
-    || lineAt(map, pt, "cmp-b-only");
+    || bOnlyAt(pt);
   const otherPlaceAt = (pt) => {
     const id = areas && !onLine(pt) && areas.placeAt(pt);
     return id && id !== state.city && state.summary?.places[id] ? id : null;
@@ -220,6 +223,9 @@ async function main() {
     return { byClass, status, onlyB };
   }
 
+  // The other dataset's missing stretches (compare): clickable like the network, never in all cities.
+  const bOnlyAt = (pt) => state.city !== ALL && lineAt(map, pt, "cmp-b-only");
+
   const lineWidth = ["interpolate", ["linear"], ["zoom"], 8, 1, 12, 2.5, 16, 5];
   const other = {
     added: false,
@@ -233,10 +239,10 @@ async function main() {
           layout: { visibility: "none", "line-cap": "round", "line-join": "round" },
           paint: { "line-color": ck.colors.only_b, "line-width": lineWidth } }, top);
         // Same hit area as the network's lines (lineAt), so all lines are equally easy to hover / click.
-        map.on("mousemove", (e) => { if (lineAt(map, e.point, "cmp-b-only")) map.getCanvas().style.cursor = "pointer"; });
+        map.on("mousemove", (e) => { if (bOnlyAt(e.point)) map.getCanvas().style.cursor = "pointer"; });
         map.on("click", (e) => {
           if (net.featureAt(e.point)) return; // the baseline line under the pointer gets the popup
-          const f = lineAt(map, e.point, "cmp-b-only");
+          const f = bOnlyAt(e.point);
           if (!f) return;
           const p = f.properties;
           const tol = state.cmpSummary?.tolerance_m ?? 20;
@@ -394,20 +400,38 @@ async function main() {
   // (b's stretch) -> missing infrastructure, should be b's class; otherwise misclassified, a's class.
   function startIssue(c) {
     const b = c.kind === "b";
+    // What each dataset says at the clicked spot: a class, "" (nothing there), or undefined (not
+    // known, e.g. the other dataset when clicked in a single-dataset tab). Prefills the form for
+    // whichever dataset the issue is about, and re-prefills it when that's switched.
+    const says = b
+      ? { a: c.status === "only" ? "" : undefined, b: c.class } // compare: missing in a; else the OSM tab
+      : { a: c.class, b: c.kind !== "cmp" ? undefined : c.status === "agree" ? c.class : c.status === "differs" ? c.other : "" };
     const draft = {
       place: c.place, placeName: state.summary?.places[c.place]?.name, dataset: defaultDataset(),
-      type: b ? "missing" : "wrong_class",
-      class: b ? "" : c.class,
-      suggested_class: b ? c.class : c.status === "differs" ? c.other : "",
-      source_class: b ? "" : c.source_class ?? "",
+      says, sourceClassA: b ? "" : c.source_class ?? "",
       note: "",
       examples: [{ lat: c.lat, lng: c.lng, heading: c.heading, segment: b ? undefined : c.id,
         class: b ? undefined : c.class, other_class: b ? c.class : c.other ?? undefined,
         status: c.status ?? undefined, source_class: b ? undefined : c.source_class ?? undefined }],
     };
+    prefill(draft);
     Object.assign(state, { draft, issueError: null, issuesOpen: true, issueSel: null });
     refresh();
   }
+
+  // Type / class / should be / source class for the draft's dataset, from what each dataset says:
+  // it has a class -> misclassified, should be the other's class (if different); it has nothing (or
+  // isn't known) -> missing infrastructure, should be the other's class.
+  function prefill(d) {
+    if (!d.says) return;
+    const isA = d.dataset === (ck?.a ?? defaultDataset());
+    const mine = isA ? d.says.a : d.says.b, theirs = isA ? d.says.b : d.says.a;
+    Object.assign(d, mine
+      ? { type: "wrong_class", class: mine, suggested_class: theirs && theirs !== mine ? theirs : "" }
+      : { type: "missing", class: "", suggested_class: theirs ?? "" });
+    d.source_class = isA ? d.sourceClassA : ""; // the other dataset's "source class" is just its class name
+  }
+
 
   // "Add issue" in the panel: no example; class pair taken from what's highlighted in the key, if any.
   function newIssue() {
@@ -487,6 +511,8 @@ async function main() {
     // clicked (once the map has settled, so the lines are rendered and can be found).
     selectExample: (issue, n) => {
       const ex = issue.examples[n];
+      // From all cities (lines not clickable there) or another city: go to the issue's city first.
+      if (state.city !== issue.place) setCity(issue.place);
       if (state.issueSel !== issue.id) selectIssue(issue);
       const token = (exampleToken = {});
       map.once("idle", () => {
@@ -500,7 +526,9 @@ async function main() {
     draftChange: (vals) => {
       const d = state.draft;
       const relevant = ["place", "dataset", "type", "class", "suggested_class"].some((k) => k in vals && (vals[k] ?? "") !== (d[k] ?? "")); // only fields the form has (no City field for one city)
+      const switched = "dataset" in vals && vals.dataset !== d.dataset;
       Object.assign(d, vals);
+      if (switched) prefill(d); // "<dataset> says" / "Should be" follow the dataset picked
       if (relevant) refresh(); // the "same as an existing issue" hint depends on these
     },
     save: async (vals) => {
@@ -508,7 +536,7 @@ async function main() {
       if (!d.place) { state.issueError = "Choose a city"; return refresh(); }
       if (!state.by) setBy(IssuesPanel.anonymousName()); // no name given at the top of the panel
       const issue = { place: d.place, dataset: d.dataset || defaultDataset(), type: d.type, class: d.class,
-        suggested_class: d.suggested_class, source_class: d.source_class.trim(), note: d.note.trim(), examples: d.examples,
+        suggested_class: d.suggested_class, source_class: (d.source_class ?? "").trim(), note: d.note.trim(), examples: d.examples,
         by: state.by, by_id: browserId() };
       if (await issueApi({ op: "add", issue })) {
         state.draft = null;
@@ -573,7 +601,7 @@ async function main() {
     renderIssues();
     Profile.render($("info"), {
       data: state.summary?.places[state.city], classes: cfg.classes, focus: state.focus,
-      onFocus: setFocus, issues: state.city === ALL ? [] : cityIssues(), // no issue dots for all cities: too busy
+      onFocus: setFocus, issues: state.city === ALL ? [] : keyIssues(), // no issue dots for all cities: too busy
       scAvailable: !!state.view?.source_classes && state.city !== ALL, showSc: state.showSc,
       onToggleSc: (on) => { state.showSc = on; refresh(); },
       showNC: state.showNC, classification: cfg.classification,
@@ -589,6 +617,12 @@ async function main() {
     });
   }
 
+
+  // Issues flagged in the class key: the city's issues about the dataset on screen (compare: the baseline).
+  const keyIssues = () => {
+    const ds = state.mode === "compare" ? ck?.a : state.source?.id;
+    return cityIssues().filter((i) => (i.dataset || defaultDataset()) === ds);
+  };
 
   function setFocus(f) { state.focus = f; state.cmpFocus = null; state.issueSel = null; refresh(); }
 
@@ -610,7 +644,6 @@ async function main() {
     search.show(p.name);
     areas?.setPlace(id);
     setParam("city", id);
-    rememberCity(id); // so the other tabs return here
     refresh();
   }
 
@@ -623,11 +656,12 @@ async function main() {
     else net.setSource(src);
     other.add();
     if (!areas) areas = addAreas(map, net.hiliteId); // once; stays below the network layers
-    // Initial city: ?city=, else keep current, else last visited, else config default.
-    const wanted = getParam("city") || state.city || lastCity() || cfg.initial_city;
+    // Initial city: ?city=, else keep current, else config default (all cities). A first visit to
+    // all cities keeps the Canada-wide view rather than zooming to the cities' extent.
+    const wanted = getParam("city") || state.city || cfg.initial_city;
     state.city = null;
     setCity(state.summary?.places[wanted] ? wanted : realPlaces(state.summary?.places)[0]?.[0],
-      { fit: firstLoad && !hadViewInUrl });
+      { fit: firstLoad && !hadViewInUrl && wanted !== ALL });
     firstLoad = false;
   }
 

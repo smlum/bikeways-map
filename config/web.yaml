@@ -3,12 +3,17 @@
 title: Bikeways map
 basemap: https://tiles.openfreemap.org/styles/positron
 
-# Initial map view (overridden by the URL hash).
-initial_view: {center: [-75.70, 45.40], zoom: 11}
+# Initial map view: fitted to this box, beside the side panel (overridden by the URL hash). Covers the
+# 75 cities, Windsor (42°N) to Yellowknife (62°N), not the Arctic. Checked for a 13" laptop window
+# (~1440x780): Whitehorse clears the panel, St. John's fits on the right.
+initial_bounds: [[-141, 41.5], [-52, 64]]
 
 # The map can't be panned outside this box ([[west, south], [east, north]]), which also stops
-# zooming out much past all of Canada. Canada itself is about [[-141, 42], [-53, 83]].
-max_bounds: [[-160, 32], [-35, 84]]
+# zooming out much past all of Canada. Canada itself is about [[-141, 42], [-53, 83]]. Wider than
+# Canada, west and south, so the initial view can sit beside the panel and centre on the cities.
+# West goes past -180 (the date line) so Yukon can be dragged clear of the panel even fully zoomed out.
+# North stops at 78°N: the mainland's Arctic coast and the southern islands, not the far north.
+max_bounds: [[-190, 20], [-30, 78]]
 # Furthest zoom out. The basemap draws city names from zoom 3 (towns from 6).
 min_zoom: 3
 
@@ -35,7 +40,7 @@ compare_key:
     only_a: "#93a6bd"  # missing in b (only in a): muted blue-grey
 
 # The map is locked to one city at a time (search box, clicking a segment, or ?city=<place id>).
-initial_city: ottawa
+initial_city: all
 # Opacity of segments outside the selected city.
 other_city_opacity: 0.25
 

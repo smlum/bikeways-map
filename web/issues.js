@@ -33,7 +33,7 @@ const IssuesPanel = (() => {
       </header>`;
     const by = !ctx.canSave ? "" : ctx.by
       ? `<label class="by-name" title="Name saved with your issues (this browser only)">as
-          <input class="by-input" value="${esc(ctx.by)}" maxlength="${BY_MAX}" size="${Math.max(4, ctx.by.length)}" aria-label="Your name"></label>`
+          <input class="by-input" value="${esc(ctx.by)}" maxlength="${BY_MAX}" size="${Math.max(4, ctx.by.length + 1)}" aria-label="Your name"></label>`
       : `<label class="by-name">as <input class="by-input by-new" maxlength="${BY_MAX}" size="9" placeholder="your name" aria-label="Your name"></label>
           <button type="button" class="by-anon">Anonymous</button>`;
     const addBtn = !draft && ctx.canAdd ? `<button class="new-issue">Add issue</button>` : "";
@@ -82,16 +82,16 @@ const IssuesPanel = (() => {
       const ex = i.examples || [];
       // "Example" buttons, one per example location ("Example 1", "Example 2"… when there are several).
       const pins = ex.map((e, n) => `<button class="pin" data-ex="${n}" title="Show on the map">Example${ex.length > 1 ? ` ${n + 1}` : ""}</button>`).join("");
-      // Card: type with example buttons on the right; what it is;
-      // note; Delete when selected.
+      // Card, at most three lines: type + who + Delete (selected only, on the left); what it's about,
+      // with its Example location(s) on the right (diagonally away from Delete); the note.
       const del = sel && ctx.canSave && i.id ? `<button class="del" title="Delete issue">Delete</button>` : "";
       return `<li class="issue-item ${sel ? "selected" : ""}" data-id="${esc(i.id ?? "")}">
         <div class="issue-line"><span class="label label-${esc(i.type)}">${esc(types[i.type] ?? i.type)}</span>
           ${i.by ? `<span class="issue-by">${esc(i.by)}</span>` : ""}
-          ${pins ? `<span class="pins">${pins}</span>` : ""}</div>
-        <div class="issue-title">${title(i)}</div>
+          ${del ? `<span class="sep">·</span>${del}` : ""}</div>
+        <div class="issue-title-row"><div class="issue-title">${title(i)}</div>
+          ${pins ? `<span class="issue-actions">${pins}</span>` : ""}</div>
         ${i.note ? `<p>${esc(i.note)}</p>` : ""}
-        ${del ? `<div class="issue-foot">${del}</div>` : ""}
       </li>`;
     }
 
@@ -115,7 +115,8 @@ const IssuesPanel = (() => {
         <label>Type <select name="type">${Object.entries(types).map(([k, t]) => opt(k, t, d.type)).join("")}</select></label>
         <label>${esc(shortOf(ds))} says <select name="class">${classOpts(d.class)}</select></label>
         <label>Should be <select name="suggested_class">${classOpts(d.suggested_class, [["exclude", "Not cycling infrastructure"]])}</select></label>
-        <label>Source class <input name="source_class" value="${esc(d.source_class ?? "")}" placeholder="optional"></label>
+        ${d.source_class ? `<div class="form-static" title="From the clicked segment (saved with the issue)"><span>Source class</span>
+          <span>${showWs(d.source_class)}</span></div>` : ""}
         <label>Note <textarea name="note" rows="2" maxlength="${NOTE_MAX}" placeholder="optional, up to ${NOTE_MAX} characters">${esc(d.note ?? "")}</textarea></label>
         ${ex ? `<div class="form-ex">Example: ${esc(ex.lat.toFixed(5))}, ${esc(ex.lng.toFixed(5))}
           ${sv ? ` · <a href="${esc(sv)}" target="_blank" rel="noopener">Street View ↗</a>` : ""}</div>` : ""}
@@ -128,14 +129,21 @@ const IssuesPanel = (() => {
     function wire() {
       el.querySelector(".issues-toggle")?.addEventListener("click", on.toggle);
       el.querySelector(".on-map input").onchange = (e) => on.toggleOnMap(e.target.checked);
+      // Name box: same characters as notes; sized to fit its text as it changes.
+      const fit = (inp) => { if (!inp.classList.contains("by-new")) inp.size = Math.max(4, inp.value.length + 1); };
       el.querySelectorAll(".by-input").forEach((inp) => inp.addEventListener("input", () => {
         const v = inp.value.replace(NOTE_BAD, "");
         if (v !== inp.value) inp.value = v;
+        fit(inp);
       }));
       const byInput = el.querySelector(".by-input");
-      if (byInput) byInput.onchange = () => { // Enter or leaving the box; empty -> anonymous (or unchanged if new)
+      if (byInput) byInput.onchange = () => { // Enter or leaving the box
         const v = byInput.value.trim();
-        if (v || ctx.by) on.setBy(v || anonymousName(), false);
+        if (!v && !ctx.by) return; // first-time prompt left empty: ask again later
+        const name = v || anonymousName(); // cleared: becomes anonymous, shown straight away
+        byInput.value = name;
+        fit(byInput);
+        on.setBy(name, false);
       };
       el.querySelector(".by-anon")?.addEventListener("click", () => on.setBy(anonymousName()));
       el.querySelector(".new-issue")?.addEventListener("click", on.newIssue);

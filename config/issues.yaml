@@ -34,12 +34,6 @@ issues:
     status: differs
     source_class: piste cyclable bidirectionnelle
   date: '2026-11-23'
-- id: 98822c96
-  place: calgary
-  dataset: ccnd_2024
-  type: missing
-  note: Missing multi-use paths
-  date: '2026-11-24'
 - id: 299dfc31
   place: fredericton
   dataset: ccnd_2024
@@ -512,3 +506,292 @@ issues:
     status: differs
     source_class: piste cyclable
   date: '2026-11-24'
+- id: 5d7942d6
+  place: calgary
+  dataset: ccnd_2024
+  type: missing
+  suggested_class: multi_use_path
+  note: Missing all multi-use paths
+  by: Anonymous Panda
+  examples:
+  - lat: 51.020825
+    lng: -114.070193
+    heading: 292
+    other_class: multi_use_path
+    status: only
+  date: '2026-11-24'
+- id: '92401918'
+  place: calgary
+  dataset: osm_2024
+  type: wrong_class
+  class: local_street_bikeway
+  suggested_class: shared_roadway
+  note: Insufficient traffic calming or signalling for local street bikeway
+  by: Anonymous Panda
+  examples:
+  - lat: 51.040494
+    lng: -114.064578
+    heading: 272
+    other_class: local_street_bikeway
+    status: only
+  date: '2026-11-24'
+- id: e64a9213
+  place: kelowna
+  dataset: osm_2024
+  type: wrong_class
+  class: multi_use_path
+  source_class: shared-use pathway, unpaved
+  suggested_class: gravel_trail
+  by: Anonymous Panda
+  examples:
+  - lat: 49.880115
+    lng: -119.419834
+    heading: 275
+    segment: ccnd_2024-4dde98c095dc
+    class: gravel_trail
+    other_class: multi_use_path
+    status: differs
+    source_class: shared-use pathway, unpaved
+  date: '2026-11-24'
+- id: be8a35dd
+  place: saskatoon
+  dataset: osm_2024
+  type: wrong_class
+  class: gravel_trail
+  note: Seems to include university parking lots
+  by: Sam
+  examples:
+  - lat: 52.148135
+    lng: -106.616891
+    heading: 158
+    other_class: gravel_trail
+    status: only
+  date: '2026-11-24'
+- id: '50056498'
+  place: montreal
+  dataset: ccnd_2024
+  type: missing
+  suggested_class: multi_use_path
+  note: MUP missing in Montreal
+  by: Sam
+  examples:
+  - lat: 45.461624
+    lng: -73.60315
+    heading: 59
+    other_class: multi_use_path
+  date: '2026-11-24'
+- id: ecdc1349
+  place: montreal
+  dataset: ccnd_2024
+  type: missing
+  class: local_street_bikeway
+  note: LSB are missing in Montreal. Perhaps 'Vélorue' in correct class
+  by: Sam
+  date: '2026-11-24'
+- id: 28a39950
+  place: oakville
+  dataset: ccnd_2024
+  type: wrong_class
+  class: bike_path
+  suggested_class: multi_use_path
+  note: This category represents multiple infrastructure types
+  by: Sam
+  by_id: 575da93431a10d17
+  date: '2026-11-25'
+- id: 79f97937
+  place: vancouver
+  dataset: ccnd_2024
+  type: wrong_class
+  class: multi_use_path
+  suggested_class: gravel_trail
+  source_class: protected bike lanes
+  by: Sam
+  by_id: 575da93431a10d17
+  examples:
+  - lat: 49.274266
+    lng: -123.19949
+    heading: 308
+    segment: ccnd_2024-37ef6d100c8f
+    class: multi_use_path
+    other_class: gravel_trail
+    status: differs
+    source_class: protected bike lanes
+  date: '2026-11-25'
+- id: 432488a9
+  place: surrey
+  dataset: ccnd_2024
+  type: wrong_class
+  class: local_street_bikeway
+  suggested_class: shared_roadway
+  source_class: neighbourhood bike route
+  note: Some neighbourhood bike routes don't meet criteria for LSB
+  by: Sam
+  by_id: 575da93431a10d17
+  examples:
+  - lat: 49.203931
+    lng: -122.828769
+    heading: 108
+    segment: ccnd_2024-955eab11238f
+    class: local_street_bikeway
+    other_class: major_shared_roadway
+    status: differs
+    source_class: neighbourhood bike route
+  date: '2026-11-25'
+- id: c9d79e74
+  place: maple_ridge
+  dataset: ccnd_2024
+  type: wrong_class
+  class: cycle_track
+  suggested_class: multi_use_path
+  source_class: separated bike lane
+  note: Some cycle tracks seem to be MUP
+  by: Sam
+  by_id: 575da93431a10d17
+  examples:
+  - lat: 49.235103
+    lng: -122.609056
+    heading: 270
+    segment: ccnd_2024-271d65d59591
+    class: cycle_track
+    other_class: multi_use_path
+    status: differs
+    source_class: separated bike lane
+  date: '2026-11-25'
+- id: dda73095
+  place: abbotsford
+  dataset: ccnd_2024
+  type: wrong_class
+  class: multi_use_path
+  suggested_class: gravel_trail
+  source_class: path
+  note: Some MUP are gravel
+  by: Sam
+  by_id: 575da93431a10d17
+  examples:
+  - lat: 49.135906
+    lng: -122.270348
+    heading: 71
+    segment: ccnd_2024-004b52758286
+    class: multi_use_path
+    other_class: gravel_trail
+    status: differs
+    source_class: path
+  date: '2026-11-25'
+- id: e41a2ef7
+  place: vernon
+  dataset: osm_2024
+  type: wrong_class
+  class: gravel_trail
+  suggested_class: multi_use_path
+  by: Sam
+  by_id: 575da93431a10d17
+  examples:
+  - lat: 50.252623
+    lng: -119.273995
+    heading: 180
+    segment: ccnd_2024-4b19082920c6
+    class: multi_use_path
+    other_class: gravel_trail
+    status: differs
+    source_class: multi-use path
+  date: '2026-11-25'
+- id: 9fe4a838
+  place: kamloops
+  dataset: osm_2024
+  type: wrong_class
+  class: gravel_trail
+  suggested_class: exclude
+  note: Represents mountain biking trails
+  by: Sam
+  by_id: 575da93431a10d17
+  examples:
+  - lat: 50.648867
+    lng: -120.404613
+    heading: 295
+    other_class: gravel_trail
+  date: '2026-11-25'
+- id: a3e56032
+  place: greater_sudbury
+  dataset: ccnd_2024
+  type: missing
+  suggested_class: multi_use_path
+  by: Sam
+  by_id: 575da93431a10d17
+  date: '2026-11-25'
+- id: d8dfa97f
+  place: gatineau
+  dataset: osm_2024
+  type: wrong_class
+  class: cycle_track
+  suggested_class: multi_use_path
+  by: Sam
+  by_id: 575da93431a10d17
+  examples:
+  - lat: 45.437327
+    lng: -75.703704
+    heading: 110
+    segment: ccnd_2024-2ceace573f29
+    class: multi_use_path
+    other_class: cycle_track
+    status: differs
+    source_class: piste multifonctionnelle
+  date: '2026-11-25'
+- id: 7b03eee8
+  place: gatineau
+  dataset: ccnd_2024
+  type: wrong_class
+  class: multi_use_path
+  suggested_class: gravel_trail
+  source_class: sentier polyvalent
+  by: Sam
+  by_id: 575da93431a10d17
+  examples:
+  - lat: 45.457185
+    lng: -75.705086
+    heading: 103
+    segment: ccnd_2024-b99db643a5b5
+    class: multi_use_path
+    other_class: gravel_trail
+    status: differs
+    source_class: sentier polyvalent
+  date: '2026-11-25'
+- id: 6b068b8a
+  place: repentigny
+  dataset: ccnd_2024
+  type: wrong_class
+  class: bike_path
+  suggested_class: multi_use_path
+  source_class: site propre
+  note: Many bike path are MUP
+  by: Sam
+  by_id: 575da93431a10d17
+  examples:
+  - lat: 45.749468
+    lng: -73.478751
+    heading: 24
+    segment: ccnd_2024-1248971c6261
+    class: bike_path
+    other_class: multi_use_path
+    status: differs
+    source_class: site propre
+  date: '2026-11-25'
+- id: 5ef14710
+  place: repentigny
+  dataset: ccnd_2024
+  type: wrong_class
+  class: bike_path
+  suggested_class: cycle_track
+  source_class: site propre
+  note: Some bike path are cycle track
+  by: Sam
+  by_id: 575da93431a10d17
+  examples:
+  - lat: 45.721027
+    lng: -73.464074
+    heading: 55
+    segment: ccnd_2024-d80a212d8f2b
+    class: bike_path
+    other_class: cycle_track
+    status: differs
+    source_class: site propre
+  date: '2026-11-25'

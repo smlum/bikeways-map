@@ -15,7 +15,9 @@ const Profile = (() => {
     }
     const prov = data.provenance || {};
     const flagged = new Set(issues.map((i) => i.source_class).filter((v) => v != null));
-    const flaggedCls = new Set(issues.map((i) => i.class).filter(Boolean));
+    // A class is flagged by issues about it: the class the data gives, or for missing infrastructure
+    // (no class in the data), the class that's missing.
+    const flaggedCls = new Set(issues.map((i) => i.class || (i.type === "missing" ? i.suggested_class : null)).filter(Boolean));
     const dot = `<span class="issue-dot" title="Has a known issue (see Issues)">!</span>`;
 
     // Source classes per CAN-BICS class: {slug: [{sc, km}]}, largest first.

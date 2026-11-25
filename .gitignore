@@ -17,3 +17,9 @@ __pycache__/
 
 # web build outputs
 web/data/
+
+# Local Netlify folder
+.netlify
+
+# Netlify CLI agent skills (generated)
+.agents/

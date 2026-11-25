@@ -58,8 +58,6 @@ function setParam(k, v) {
   else u.searchParams.set(k, v);
   history.replaceState(null, "", u);
 }
-function lastCity() { try { return localStorage.getItem("lastCity"); } catch { return null; } }
-function rememberCity(id) { try { localStorage.setItem("lastCity", id); } catch {} }
 
 /**
  * One network (PMTiles) shown on a map, with a highlight layer, hover cursor and click popup.

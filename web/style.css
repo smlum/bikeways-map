@@ -125,8 +125,9 @@ p.small { margin: 6px 0 0; line-height: 1.4; }
   padding: 0 7px; border-radius: 10px; border: 1px solid var(--border); white-space: nowrap; vertical-align: 1px;
 }
 .label .swatch { width: 10px; height: 3px; }
-.label-wrong_class { background: #ffebe9; border-color: #ffcecb; color: #a40e26; }
-.label-missing { background: #fff8c5; border-color: #f2d36b; color: #7d4e00; }
+/* Issue types: missing = orange (stronger), misclassified = yellow (milder). */
+.label-missing { background: #fff1e5; border-color: #ffc799; color: #9a3c00; }
+.label-wrong_class { background: #fff8c5; border-color: #f2d36b; color: #7d4e00; }
 .issue-dot {
   display: inline-grid; place-items: center; width: 13px; height: 13px; border-radius: 50%;
   background: #c2255c; color: #fff; font-size: 9px; font-weight: 700; vertical-align: 1px;
@@ -147,13 +148,13 @@ a { color: #0b63c4; }
   display: flex; flex-direction: column; background: var(--bg); border: 1px solid var(--border);
   border-radius: 8px; box-shadow: 0 2px 8px rgb(0 0 0 / .08);
 }
-.issues-head { display: flex; align-items: baseline; gap: 8px; padding: 10px 14px 0; }
+.issues-head { display: flex; align-items: baseline; gap: 8px; padding: 10px 14px 8px; border-bottom: 1px solid var(--border); }
 .issues-head h2 { font-size: 15px; margin: 0; }
 .issues-place { flex: 1; font-size: 12px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .on-map { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); cursor: pointer; white-space: nowrap; align-self: center; }
 .on-map input { margin: 0; }
 .by-name { display: flex; align-items: center; gap: 2px; font-size: 12px; color: var(--muted); min-width: 0; }
-.by-name .by-input { flex: none; max-width: 160px; }
+.by-name .by-input { flex: none; max-width: 200px; }
 .by-input { font: inherit; color: var(--fg); border: 1px solid transparent; border-radius: 4px; padding: 1px 4px;
   background: none; min-width: 0; flex: 1; }
 .by-input:hover { border-color: var(--border); }
@@ -181,14 +182,17 @@ a { color: #0b63c4; }
 .issue-title { font-size: 13px; font-weight: 500; margin-top: 4px; }
 .issue-title .swatch { display: inline-block; width: 12px; height: 3px; vertical-align: middle; margin-right: 4px; }
 .issue-item p { margin: 3px 0 0; }
-.issue-foot { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 11px; }
 .issue-line { align-items: center; justify-content: flex-start; }
-.issue-line .pins { margin-left: auto; }
+.issue-actions { margin-left: auto; display: inline-flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 4px; font-size: 11px; }
+.issue-line .sep { color: var(--muted); font-size: 11px; }
+.issue-line .del { font-size: 11px; }
+.issue-title-row { display: flex; align-items: baseline; gap: 8px; margin-top: 4px; }
+.issue-title-row .issue-title { margin-top: 0; min-width: 0; }
 .pins { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; }
 .pin { all: unset; cursor: pointer; font-size: 11px; color: #c2255c; white-space: nowrap; }
 .pin:hover { text-decoration: underline; }
-.del { all: unset; margin-left: auto; color: #a40e26; cursor: pointer; }
-.del:hover { text-decoration: underline; }
+.del { all: unset; color: var(--muted); cursor: pointer; }
+.del:hover { color: #a40e26; text-decoration: underline; }
 .issue-form { display: flex; flex-direction: column; gap: 6px; padding: 10px 0 12px; border-bottom: 1px solid var(--border);
   font-size: 12px; }
 .issue-form .form-title { font-weight: 600; font-size: 13px; }
@@ -196,6 +200,8 @@ a { color: #0b63c4; }
 .issue-form select, .issue-form input, .issue-form textarea { font: inherit; font-size: 12px; padding: 3px 5px;
   border: 1px solid var(--border); border-radius: 5px; min-width: 0; background: var(--bg); color: var(--fg); }
 .issue-form textarea { resize: vertical; }
+.form-static { display: grid; grid-template-columns: 78px 1fr; gap: 6px; color: var(--muted); }
+.form-static span + span { color: var(--fg); }
 .form-ex { color: var(--muted); }
 .match { background: #fff8c5; border: 1px solid #f2d36b; border-radius: 6px; padding: 5px 8px; line-height: 1.5; }
 .match .swatch { display: inline-block; width: 10px; height: 3px; vertical-align: middle; margin-right: 3px; }
