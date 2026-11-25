@@ -795,3 +795,17 @@ issues:
     status: differs
     source_class: site propre
   date: '2026-11-25'
+- id: 6bf80c7d
+  place: ottawa
+  dataset: osm_2024
+  type: wrong_class
+  class: major_shared_roadway
+  suggested_class: exclude
+  by: Sam
+  by_id: 575da93431a10d17
+  examples:
+  - lat: 45.417179
+    lng: -75.702336
+    heading: 60
+    other_class: major_shared_roadway
+  date: '2026-11-25'

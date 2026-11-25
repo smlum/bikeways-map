@@ -111,7 +111,7 @@ async function main() {
     const hidden = compare ? cmpHiddenExpr() : state.showNC ? false : ncExpr("class");
     net.setPaint(["case", strong, color((c) => c), color((c) => fade(c, a))],
       ["case", hidden, 0, 1], ["case", strong, 1, 0]);
-    other.show(compare);
+    other.show(compare, ["case", hidden, 0, strong, 0.9, 0]);
   }
 
   // --- picking a city on the map -------------------------------------------------
@@ -177,11 +177,14 @@ async function main() {
 
   // cmpFocus: {side?, status?, cls?, other?}. side "b" = the other dataset's missing stretches;
   // side "a" marks rows under the status summary (so class rows don't open). Unset keys = any.
-  const sameFocus = (x, y) => !!x && !!y && ["side", "status", "cls", "other"].every((k) => x[k] === y[k]);
+  // sides: "both_a" | "both_b" = matched stretches that one dataset draws as both sides of the street
+  // and the other as one line (pipeline/compare.py _both_sides); drawn dashed.
+  const sameFocus = (x, y) => !!x && !!y && ["side", "status", "cls", "other", "sides"].every((k) => x[k] === y[k]);
   const cmpFocusExpr = (f) => {
     if (f.side === "b") return false;
     const e = ["all"];
     if (f.status) e.push(["==", ["get", "status"], f.status]);
+    if (f.sides) e.push(["==", ["get", "sides"], f.sides]);
     if (f.cls) e.push(["==", ["get", "class"], f.cls]);
     if (f.other) e.push(["==", ["get", "other_class"], f.other]);
     return e;
@@ -192,11 +195,16 @@ async function main() {
   const cmpTitle = (p) => `${statusSw(p.status)}${esc({ agree: "Match", differs: "Class differs", only: `Missing in ${B()}` }[p.status] ?? p.status)}`;
   const says = (who, html) => `<tr><th>${esc(who)} says</th><td>${html}</td></tr>`;
   const clsHtml = (slug) => `<span class="swatch inline" style="background:${classInfo(cfg, slug).color}"></span>${esc(classInfo(cfg, slug).label)}`;
+  const sidesText = (sd) => {
+    const [two, one] = sd === "both_a" ? [A(), B()] : [B(), A()];
+    return `${esc(two)}: both sides, ${esc(one)}: one line`;
+  };
   function matchRows(p) {
     const tol = state.cmpSummary?.tolerance_m ?? 20;
     return says(A(), clsHtml(p.class)) + says(B(), p.status === "agree" ? clsHtml(p.class)
       : p.status === "differs" && p.other_class ? clsHtml(p.other_class)
-        : `<span class="empty">nothing within ${tol} m</span>`);
+        : `<span class="empty">nothing within ${tol} m</span>`)
+      + (p.sides ? `<tr><th>Drawn</th><td>${sidesText(p.sides)}</td></tr>` : "");
   }
 
   // km in the current city, after the non-conforming filter.
@@ -220,7 +228,10 @@ async function main() {
       c.total = c.agree + c.differs + c.only;
       c.pairs = [...c.pairs].map(([other, km]) => ({ other, km })).sort((x, y) => y.km - x.km);
     }
-    return { byClass, status, onlyB };
+    // Matched street km drawn both sides in one dataset, one line in the other.
+    const sides = { both_a: 0, both_b: 0 };
+    (p.sides || []).forEach(([sd, cls, km]) => { if (!cmpHidden("agree", cls, cls)) sides[sd] += km; });
+    return { byClass, status, onlyB, sides };
   }
 
   // The other dataset's missing stretches (compare): clickable like the network, never in all cities.
@@ -235,6 +246,11 @@ async function main() {
       const top = map.getStyle().layers.find((l) => l.type === "symbol")?.id;
       if (!this.added) {
         map.addSource("cmp", { type: "vector", url: `pmtiles://${new URL(`data/${cmpPair.tiles}`, location.href)}` });
+        // Both sides vs one line: a light dash inside the baseline's line, from street zoom only.
+        map.addLayer({ id: "cmp-a-sides", type: "line", source: "cmp", "source-layer": "a", minzoom: 12,
+          filter: ["has", "sides"], layout: { visibility: "none", "line-join": "round" },
+          paint: { "line-color": "#fff", "line-dasharray": [2, 2],
+            "line-width": ["interpolate", ["linear"], ["zoom"], 12, 0.8, 16, 1.6] } }, top);
         map.addLayer({ id: "cmp-b-only", type: "line", source: "cmp", "source-layer": "b",
           layout: { visibility: "none", "line-cap": "round", "line-join": "round" },
           paint: { "line-color": ck.colors.only_b, "line-width": lineWidth } }, top);
@@ -258,15 +274,18 @@ async function main() {
         });
         this.added = true;
       } else {
+        map.moveLayer("cmp-a-sides", top);
         map.moveLayer("cmp-b-only", top);
       }
     },
-    show(on) {
+    // sidesOpacity: the dash's opacity expression (only on the baseline's strong, visible lines).
+    show(on, sidesOpacity) {
       if (!this.added) return;
       const inCity = inCityExpr();
       const f = state.cmpFocus;
-      map.setLayoutProperty("cmp-b-only", "visibility", on ? "visible" : "none");
+      for (const id of ["cmp-a-sides", "cmp-b-only"]) map.setLayoutProperty(id, "visibility", on ? "visible" : "none");
       if (!on) return this.popup.remove();
+      map.setPaintProperty("cmp-a-sides", "line-opacity", sidesOpacity);
       map.setFilter("cmp-b-only", ["all", inCity, ["==", ["get", "status"], "only"],
         state.includeNC ? true : ["!", ncExpr("class")]]);
       const dim = fade(ck.colors.only_b, DIM);
@@ -280,7 +299,7 @@ async function main() {
   // km as "a / b" and, when selected, the class's breakdown; then the status rows, which are the
   // map's colours.
   function fillCompare(ul) {
-    const { byClass, status, onlyB } = cmpKm();
+    const { byClass, status, onlyB, sides } = cmpKm();
     const f = state.cmpFocus;
     const sw = (bg) => `<span class="swatch" style="background:${bg}"></span>`;
     const color = (slug) => classInfo(cfg, slug).color;
@@ -335,7 +354,13 @@ async function main() {
     const byCls = (side, st, km) => classes.filter((c) => km(c.slug)).sort((x, y) => km(y.slug) - km(x.slug)).map((c) =>
       subRow({ side, status: st, cls: c.slug }, `<span class="name">${sw(side === "b" ? ck.colors.only_b : ck.colors.only_a)}${esc(c.label)}</span>`, km(c.slug))).join("");
     const openIf = (fo) => f && f.side === fo.side && f.status === fo.status;
-    ul.append(row({ side: "a", status: "agree" }, `${sw(ck.colors.agree)}<span class="name">Match</span>`, status.agree));
+    // Match opens the both-sides-vs-one-line breakdown (street km), when there is any.
+    const sidesSub = () => ["both_b", "both_a"].filter((sd) => sides[sd] >= 0.05).map((sd) =>
+      subRow({ side: "a", status: "agree", sides: sd }, `<span class="name"><span class="swatch dashed"
+        style="background:${ck.colors.agree}"></span>${sidesText(sd)}</span>`, sides[sd],
+        "Street km. Can't tell which is right: one line may be a two-way facility")).join("");
+    ul.append(row({ side: "a", status: "agree" }, `${sw(ck.colors.agree)}<span class="name">Match</span>`, status.agree, {
+      sub: f?.side === "a" && f.status === "agree" ? sidesSub() : "" }));
     // Class differs opens by CCND class (largest first); a class opens what the other dataset calls it.
     const differsSub = () => classes.filter((c) => byClass[c.slug]?.differs)
       .sort((x, y) => byClass[y.slug].differs - byClass[x.slug].differs)

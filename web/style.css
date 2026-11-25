@@ -91,6 +91,8 @@ input[type="search"], #city-search { font: inherit; padding: 5px 8px; border: 1p
 .small { font-size: 11px; }
 p.small { margin: 6px 0 0; line-height: 1.4; }
 .swatch { width: 18px; height: 4px; border-radius: 2px; flex: none; }
+/* Both sides vs one line (compare): the map's white dash inside the line. */
+.swatch.dashed { background-image: repeating-linear-gradient(90deg, transparent 0 2px, rgba(255,255,255,.9) 2px 3px); }
 
 .popup h3 { margin: 0 0 6px; font-size: 14px; display: flex; align-items: center; gap: 6px; }
 .popup table { border-collapse: collapse; font-size: 12px; }

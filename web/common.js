@@ -27,7 +27,8 @@ function withAll(summary) {
     Object.assign(all, { by_class_km: add("by_class_km"), total_km: ps.reduce((t, p) => t + (p.total_km || 0), 0),
       bounds: [0, 1, 2, 3].map((i) => (i < 2 ? Math.min : Math.max)(...ps.map((p) => p.bounds[i]))) });
   } else { // comparison summary: concatenate each side's rows
-    Object.assign(all, { a: ps.flatMap((p) => p.a || []), b: ps.flatMap((p) => p.b || []) });
+    Object.assign(all, { a: ps.flatMap((p) => p.a || []), b: ps.flatMap((p) => p.b || []),
+      sides: ps.flatMap((p) => p.sides || []) });
   }
   summary.places = { [ALL]: all, ...summary.places };
   return summary;
